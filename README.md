@@ -1,8 +1,12 @@
-# Folio Feed
-A web application that can be used to track the news regarding the stocks in a portfolio and their current trend.
+# Folio Feed: Your Personalized Stock News and Sentiment Dashboard
+In today's fast-paced financial markets, keeping track of news affecting your stock portfolio can be a daunting task. 
+Even more challenging is understanding the overall sentiment of the news related to each stock, which can be pivotal in making informed investment decisions. 
+Folio Feed addresses this gap by offering a one-stop solution to aggregate, analyze, and visualize news articles for the stocks in your portfolio.
 
-This application collects the news regarding the stocks listed in user's portfolio from various sources and 
-using a sentiment analysis model, we rate the news as positive, negative or neutral.
+Folio Feed not only aggregates news from multiple, reputable sources but also employs advanced sentiment analysis to categorize each article as positive, negative, or neutral. 
+Through an easy-to-use dashboard, Folio Feed empowers investors to keep their fingers on the pulse of companies they have invested in, without having to sift through a myriad of news portals and financial reports.
+
+With Folio Feed, stay updated and make smarter investment choices, even on your busiest days.
 
 ## Components
 - Web Application
@@ -16,7 +20,7 @@ using a sentiment analysis model, we rate the news as positive, negative or neut
 - **Frontend**: HTML, CSS, JS, Vue.js, Nuxt.js
 - **Database**: MongoDB
 - **Message Broker**: RabbitMQ
-- **Deployment**: Docker, Kubernetes, Helm, Terraform, Google Cloud Platform
+- **Deployment**: Docker, Kubernetes (Google Kubernetes Engine), Helm, Terraform, Google Cloud Platform
 - **CI/CD**: Git Actions
 - **Monitoring**: Prometheus, Grafana
 
@@ -67,7 +71,7 @@ graph LR
             DA --> DB
             BE --> DB
             ing -- / --> FE
-            ing -- /api --> BE
+            ing -- "/api (RESTful API)" --> BE
             BE --> MQ
             MQ --> DA
         
@@ -87,9 +91,9 @@ graph LR
         on_merge_action -- helm deploy --> GKE
         DA -- sentiment analysis --> NLP_AI
         
-        DA -- metrics --> statsd
-        BE -- metrics -->  statsd
-        DF -- metrics -->  statsd
+        DA -- "metrics (UDP)" --> statsd
+        BE -- "metrics (UDP)" -->  statsd
+        DF -- "metrics (UDP)" -->  statsd
         
         ing -- /dashboard --> grafana
         
@@ -99,7 +103,7 @@ graph LR
     on_merge_action -- image build --> GCR
     DF -- NEWS Data --> news_api
     user -- HTTPS Requests--> ing
-    ing -- response --> user
+    ing -- Response --> user
     
     TF[Terraform] -- deploy --> GCP
     dev -- infrastructure changes --> TF
