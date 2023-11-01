@@ -22,7 +22,7 @@ With Folio Feed, stay updated and make smarter investment choices, even on your 
 - **Message Broker**: RabbitMQ
 - **Deployment**: Docker, Kubernetes (Google Kubernetes Engine), Helm, Terraform, Google Cloud Platform
 - **CI/CD**: Git Actions
-- **Monitoring**: Prometheus, Grafana
+- **Monitoring**: Google Managed Prometheus, Google Cloud Monitoring
 
 ## Basic Architecture
 
@@ -75,27 +75,15 @@ graph LR
             BE --> MQ
             MQ --> DA
         
-        subgraph metrics 
-            statsd[StatsD]
-            statsd_exp[StatsD Exporter]
-            prometheus[Prometheus]
-            grafana[Grafana]
-            
-            statsd --> statsd_exp
-            statsd_exp --> prometheus
-            prometheus --> grafana
-        end
+            prometheus[GKE Managed Prometheus]
             
         end
         GKE -- pull image --> GCR
         on_merge_action -- helm deploy --> GKE
         DA -- sentiment analysis --> NLP_AI
         
-        DA -- "metrics (UDP)" --> statsd
-        BE -- "metrics (UDP)" -->  statsd
-        DF -- "metrics (UDP)" -->  statsd
+        prometheus -- metrics --> monitoring[Google Cloud Monitoring]
         
-        ing -- /dashboard --> grafana
         
     end
     

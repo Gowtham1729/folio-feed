@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "folio-feed.fullname" . }}-ingress
+  labels:
+    {{- include "folio-feed.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    cloud.google.com/neg: '{"ingress": true}'
+
+
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "folio-feed.fullname" . }}
+                port:
+                  number: 80
