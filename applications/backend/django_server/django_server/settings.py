@@ -10,22 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
-DJANGO_ENV = os.getenv('DJANGO_ENV', False)
-DJANGO_SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'abc123')
+DJANGO_ENV = os.getenv("DJANGO_ENV", False)
+DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "abc123")
 
 # Database
-DB_NAME = os.getenv('DB_NAME', 'folio-feed')
-DB_USER = os.getenv('DB_USER', 'postgres')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-DB_HOST = os.getenv('DB_HOST', 'localhost')
-DB_PORT = os.getenv('DB_PORT', '5432')
+DB_NAME = os.getenv("DB_NAME", "folio-feed")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +38,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if DJANGO_ENV != 'local':
+if DJANGO_ENV != "local":
     DEBUG = False
 else:
     DEBUG = True
@@ -47,8 +48,8 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 INSTALLED_APPS = []
 
-if DJANGO_ENV != 'local':
-    INSTALLED_APPS.append('daphne')
+if DJANGO_ENV != "local":
+    INSTALLED_APPS.append("daphne")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -138,7 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = Path(BASE_DIR, 'static')
+STATIC_ROOT = Path(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

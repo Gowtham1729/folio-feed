@@ -13,13 +13,9 @@ resource "google_container_cluster" "folio-feed-cluster" {
     }
     enable_components = [
       "SYSTEM_COMPONENTS",
-      "API_SERVER",
-      "SCHEDULER",
-      "CONTROLLER_MANAGER",
       "STORAGE",
       "HPA",
       "POD",
-      "DAEMONSET",
       "DEPLOYMENT",
       "STATEFULSET"
     ]

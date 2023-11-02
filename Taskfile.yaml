@@ -6,7 +6,7 @@ tasks:
   install-backend:
     desc: Install poetry and dependencies for the backend server.
     cmds:
-      - pip show poetry --quiet || pip3 install poetry
+      - pip3 show poetry --quiet || pip3 install poetry
       - cd applications/backend && poetry install
 
   run-db:
@@ -42,9 +42,9 @@ tasks:
   install-lint:
     desc: Install isort, black and mypy.
     cmds:
-      - pip show black --quiet || pip3 install black==23.10.1
-      - pip show isort --quiet|| pip3 install isort==5.12.0
-      - pip show mypy --quiet || pip3 install mypy==1.6.1
+      - pip3 show black --quiet || pip3 install black==23.10.1
+      - pip3 show isort --quiet|| pip3 install isort==5.12.0
+      - pip3 show mypy --quiet || pip3 install mypy==1.6.1
 
   lint-check:
     desc: Run isort, black and mypy on all files but only check.
@@ -62,3 +62,21 @@ tasks:
     cmds:
       - isort .
       - black .
+
+  test-backend:
+    desc: Run tests for the backend server.
+    deps:
+      - install-backend
+    cmds:
+#      - cd applications/backend && poetry run pytest
+      - cd applications/backend/django_server && poetry run python manage.py test
+
+  test-fetcher:
+    desc: Run tests for the Data Fetcher.
+    cmds:
+      - echo "Tested the Data Fetcher"
+
+  test-analyzer:
+    desc: Run tests for the Data Analyzer.
+    cmds:
+      - echo "Tested the Data Analyzer"
