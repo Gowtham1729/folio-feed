@@ -13,10 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  lint-check:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.11
@@ -27,12 +25,19 @@ jobs:
       uses: arduino/setup-task@v1.0.3
     - name: Run Lint
       run: task lint-check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Set up Taskfile
+      uses: arduino/setup-task@v1.0.3
     - name: Test Backend
       run: task test-backend
-    - name: Test Data Fetcher
-      run: task test-fetcher
-    - name: Test Data Analyzer
-      run: task test-analyzer
     - name: Test Data Fetcher
       run: task test-fetcher
     - name: Test Data Analyzer
