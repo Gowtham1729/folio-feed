@@ -1,0 +1,64 @@
+version: '3'
+
+silent: true
+
+tasks:
+  install-backend:
+    desc: Install poetry and dependencies for the backend server.
+    cmds:
+      - pip show poetry --quiet || pip3 install poetry
+      - cd applications/backend && poetry install
+
+  run-db:
+    desc: Run a postgresql server.
+    cmds:
+      - docker run -e POSTGRES_DB=folio-feed -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -v pg_data:/var/lib/postgresql/data postgres
+
+  run-backend:
+    desc: Run a debug backend server (Not used in production server).
+    deps:
+      - install-backend
+    cmds:
+      - cd applications/backend/django_server && poetry run python manage.py runserver
+
+  build-backend-image:
+    desc: Build a backend server docker image.
+    cmd: cd applications/backend && docker build -t folio-feed-backend .
+
+  install-frontend:
+    desc: Install npm dependencies for the frontend server.
+    cmds:
+      - cd applications/frontend && npm install
+
+  build-frontend-image:
+    desc: Build a frontend server docker image.
+    cmd: cd applications/frontend && docker build -t folio-feed-frontend .
+
+  run-frontend:
+    desc: Run a frontend server.
+    cmds:
+      - cd applications/frontend && npm run dev
+
+  install-lint:
+    desc: Install isort, black and mypy.
+    cmds:
+      - pip show black --quiet || pip3 install black==23.10.1
+      - pip show isort --quiet|| pip3 install isort==5.12.0
+      - pip show mypy --quiet || pip3 install mypy==1.6.1
+
+  lint-check:
+    desc: Run isort, black and mypy on all files but only check.
+    deps:
+      - install-lint
+    cmds:
+      - isort --check .
+      - black --check .
+      - mypy --ignore-missing-imports .
+
+  lint:
+    desc: Run isort, black and mypy on all files.
+    deps:
+      - install-lint
+    cmds:
+      - isort .
+      - black .

@@ -235,3 +235,5 @@ Session.vim
 **/charts/*.tgz
 
 .history
+
+secrets/
