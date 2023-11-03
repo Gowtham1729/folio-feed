@@ -53,6 +53,8 @@ if ENV != "local":
     INSTALLED_APPS.append("daphne")
 
 INSTALLED_APPS = [
+    "rest_framework",
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -64,6 +66,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -95,6 +98,7 @@ ASGI_APPLICATION = "django_server.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+CORS_ALLOW_ALL_ORIGINS = True
 
 DATABASES = {
     "default": {
