@@ -42,10 +42,10 @@ jobs:
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
         location: ${{ env.GKE_LOCATION }}
-
-    - id: 'get-pods'
-      run: 'kubectl get pods'
-
-    - name: helm chart list
-      run: helm list -n folio-feed
+    
+    - name: Set up Taskfile
+      uses: arduino/setup-task@v1.0.3
+      
+    - name: helm deploy
+      run: task helm-upgrade
       
