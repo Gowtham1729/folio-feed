@@ -3,11 +3,10 @@ name: Helm Deploy to GKE
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "infrastructure/k8s/folio-feed-helm/**"
 
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  
-  GAR_LOCATION: us-central1
   GKE_CLUSTER: folio-feed-cluster
   GKE_LOCATION: us-central1
 
