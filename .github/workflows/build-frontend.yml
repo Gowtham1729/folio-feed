@@ -42,3 +42,15 @@ jobs:
     # Push the Docker image to Google Artifact Registry
     - name: Publish
       run: task push-frontend-image tag="$GITHUB_SHA"
+
+    - name: Replace Frontend Image Tag
+      run: sed -i "s/\(&frontendImageTag\) [^[:space:]]*/\1 $GITHUB_SHA/g" infrastructure/k8s/folio-feed-helm/values.yaml
+
+    - name: Commit the Changes
+      run: |
+        git config user.name "Github Actions"
+        git config user.email github-actions@github.com
+        git diff
+        git add infrastructure/k8s/folio-feed-helm/values.yaml
+        git commit -m "frontend image update: $GITHUB_SHA"
+        git push origin main

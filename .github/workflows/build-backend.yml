@@ -33,15 +33,15 @@ jobs:
     - name: Docker configuration
       run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
       
-#    - name: Set up Taskfile
-#      uses: arduino/setup-task@v1.0.3
-#
-#    - name: Build
-#      run: task build-backend-image tag="$GITHUB_SHA"
-#
-#    # Push the Docker image to Google Artifact Registry
-#    - name: Publish
-#      run: task push-backend-image tag="$GITHUB_SHA"
+    - name: Set up Taskfile
+      uses: arduino/setup-task@v1.0.3
+
+    - name: Build
+      run: task build-backend-image tag="$GITHUB_SHA"
+
+    # Push the Docker image to Google Artifact Registry
+    - name: Publish
+      run: task push-backend-image tag="$GITHUB_SHA"
 
     - name: Replace Backend Image Tag
       run: sed -i "s/\(&backendImageTag\) [^[:space:]]*/\1 $GITHUB_SHA/g" infrastructure/k8s/folio-feed-helm/values.yaml
