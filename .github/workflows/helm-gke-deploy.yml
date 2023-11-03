@@ -1,0 +1,51 @@
+name: Helm Deploy to GKE
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  
+  GAR_LOCATION: us-central1
+  GKE_CLUSTER: folio-feed-cluster
+  GKE_LOCATION: us-central1
+
+jobs:
+  helm-deploy:
+    name: Helm Deploy to GKE
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Authentication via credentials json
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: "v3.12.3"
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v1'
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_LOCATION }}
+
+    - id: 'get-pods'
+      run: 'kubectl get pods'
+
+    - name: helm chart list
+      run: helm list -n folio-feed
+      
