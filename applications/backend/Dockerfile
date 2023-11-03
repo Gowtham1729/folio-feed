@@ -1,4 +1,4 @@
-FROM python:3.11-buster as builder
+FROM --platform=linux/amd64 python:3.11-buster as builder
 
 RUN pip install poetry==1.6.1
 
@@ -13,7 +13,7 @@ COPY pyproject.toml poetry.lock ./
 
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev
 
-FROM python:3.11-slim-buster as runtime
+FROM --platform=linux/amd64 python:3.11-slim-buster as runtime
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"

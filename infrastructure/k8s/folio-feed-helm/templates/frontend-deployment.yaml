@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "folio-feed.fullname" . }}-frontend
+  labels:
+    {{- include "folio-feed.labels" . | nindent 4 }}
+    app: frontend
+spec:
+  {{- if not .Values.frontend.autoscaling.enabled }}
+  replicas: {{ .Values.frontend.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+        {{- include "folio-feed.selectorLabels" . | nindent 6 }}
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+          {{- include "folio-feed.selectorLabels" . | nindent 8 }}
+        app: frontend
+    spec:
+      serviceAccountName: {{ include "folio-feed.fullname" . }}-frontend-service-account
+      nodeSelector:
+        {{- toYaml .Values.frontend.nodeSelector | nindent 8 }}
+      containers:
+        - name: nuxt-js-nginx
+          {{- with .Values.frontend.image }}
+          image: '{{- printf "%s/%s:%s" .registry .repository .tag}}'
+          {{- end}}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          command: ["nginx", "-g", "daemon off;"]
+          env:
+            - name: ENV
+              value: {{ .Values.environment }}
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "folio-feed.fullname" . }}-backend
+  labels:
+    {{- include "folio-feed.labels" . | nindent 4 }}
+    app: backend
+spec:
+  {{- if not .Values.backend.autoscaling.enabled }}
+  replicas: {{ .Values.backend.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+        {{- include "folio-feed.selectorLabels" . | nindent 6 }}
+      app: backend
+
+  template:
+    metadata:
+      labels:
+          {{- include "folio-feed.selectorLabels" . | nindent 8 }}
+        app: backend
+    spec:
+      serviceAccountName: {{ include "folio-feed.fullname" . }}-backend-service-account
+      nodeSelector:
+        {{- toYaml .Values.backend.nodeSelector | nindent 8 }}
+      containers:
+        - name: django
+          {{- with .Values.backend.image }}
+          image: '{{- printf "%s/%s:%s" .registry .repository .tag}}'
+          {{- end}}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          command: ["daphne", "django_server.asgi:application", "-b", "0.0.0.0", "-p", "8000"]
+          env:
+            - name: ENV
+              value: {{ .Values.environment }}
+            - name: LOG_FORMAT
+              value: 'json'
+            - name: LOG_LEVEL
+              value: 'INFO'
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: django-secret-key
+            - name: DB_HOST
+              value: folio-feed-postgresql.folio-feed.svc.cluster.local
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_NAME
+              value: "folio-feed"
+            - name: DB_USER
+              value: "postgres"
+            - name: DB_PASSWORD
+              valueFrom:
+                  secretKeyRef:
+                    name: postgresql-password
+                    key: postgres-password
+          livenessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8000
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8000
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}

@@ -2,6 +2,11 @@ version: '3'
 
 silent: true
 
+vars:
+  tag:
+    desc: The tag of the docker image to be built.
+    sh: echo "latest"
+
 tasks:
   install-backend:
     desc: Install poetry and dependencies for the backend server.
@@ -23,7 +28,11 @@ tasks:
 
   build-backend-image:
     desc: Build a backend server docker image.
-    cmd: cd applications/backend && docker build -t folio-feed-backend .
+    cmd: cd applications/backend && docker build -t us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-backend:{{.tag}} .
+
+  push-backend-image:
+    desc: Push a backend server docker image to the image registry.
+    cmd: docker push us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-backend:{{.tag}}
 
   install-frontend:
     desc: Install npm dependencies for the frontend server.
@@ -32,7 +41,11 @@ tasks:
 
   build-frontend-image:
     desc: Build a frontend server docker image.
-    cmd: cd applications/frontend && docker build -t folio-feed-frontend .
+    cmd: cd applications/frontend && docker build -t us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-frontend:{{.tag}} .
+
+  push-frontend-image:
+    desc: Push a frontend server docker image to the image registry.
+    cmd: docker push us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-frontend:{{.tag}}
 
   run-frontend:
     desc: Run a frontend server.
@@ -80,3 +93,15 @@ tasks:
     desc: Run tests for the Data Analyzer.
     cmds:
       - echo "Tested the Data Analyzer"
+
+
+  # Infrastructure tasks
+  helm-upgrade:
+    desc: Upgrade the helm chart.
+    cmds:
+      - cd infrastructure/k8s/folio-feed-helm && helm upgrade --install folio-feed -f values.yaml --namespace folio-feed . --debug
+
+  terraform-deploy:
+    desc: Apply the terraform configuration.
+    cmds:
+      - cd infrastructure/terraform && terraform apply -auto-approve

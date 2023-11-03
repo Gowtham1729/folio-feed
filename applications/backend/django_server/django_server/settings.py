@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
-DJANGO_ENV = os.getenv("DJANGO_ENV", False)
+ENV = os.getenv("ENV", "prod")
 DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "abc123")
 
 # Database
@@ -38,17 +38,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if DJANGO_ENV != "local":
+if ENV != "local":
     DEBUG = False
 else:
     DEBUG = True
 
+# FORCE_SCRIPT_NAME = "/api"
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = []
 
-if DJANGO_ENV != "local":
+if ENV != "local":
     INSTALLED_APPS.append("daphne")
 
 INSTALLED_APPS = [
