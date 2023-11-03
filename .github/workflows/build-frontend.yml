@@ -1,10 +1,10 @@
-name: Build Backend
+name: Build Frontend
 
 on:
   push:
     branches: [ "main" ]
     paths:
-      - "applications/backend/**"
+      - "applications/frontend/**"
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -37,8 +37,8 @@ jobs:
       uses: arduino/setup-task@v1.0.3
 
     - name: Build
-      run: task build-backend-image tag="$GITHUB_SHA"
+      run: task build-frontend-image tag="$GITHUB_SHA"
 
     # Push the Docker image to Google Artifact Registry
     - name: Publish
-      run: task push-backend-image tag="$GITHUB_SHA"
+      run: task push-frontend-image tag="$GITHUB_SHA"
