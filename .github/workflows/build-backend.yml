@@ -23,8 +23,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
 
-    # Authentication via credentials json
+      # Authentication via credentials json
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'
       with:
@@ -53,4 +55,4 @@ jobs:
         git diff
         git add infrastructure/k8s/folio-feed-helm/values.yaml
         git commit -m "backend image update: $GITHUB_SHA"
-        git push https://${{ secrets.PAT_TOKEN }}@github.com/Gowtham1729/folio-feed.git main
+        git push origin main
