@@ -96,8 +96,16 @@ tasks:
 
 
   # Infrastructure tasks
+  helm-setup:
+    desc: Setup helm.
+    cmds:
+      - helm repo add bitnami https://charts.bitnami.com/bitnami
+      - cd infrastructure/k8s/folio-feed-helm && helm dependency build
+
   helm-upgrade:
     desc: Upgrade the helm chart.
+    deps:
+      - helm-setup
     cmds:
       - cd infrastructure/k8s/folio-feed-helm && helm upgrade --install folio-feed -f values.yaml --namespace folio-feed . --debug
 
