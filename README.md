@@ -18,7 +18,7 @@ With Folio Feed, stay updated and make smarter investment choices, even on your 
 - **Backend**: Python, Flask
 - **Testing**: Pytest
 - **Frontend**: HTML, CSS, JS, Vue.js, Nuxt.js
-- **Database**: MongoDB
+- **Database**: Postgresql
 - **Message Broker**: RabbitMQ
 - **Deployment**: Docker, Kubernetes (Google Kubernetes Engine), Helm, Terraform, Google Cloud Platform
 - **CI/CD**: Git Actions
@@ -62,7 +62,7 @@ graph LR
             DA[Data Analyzer]
             FE[Vue JS Frontend]
             BE[Flask Backend]
-            DB[(Mongo DB)]
+            DB[(Postgres)]
             ing[GKE Ingress]
             MQ[RabbitMQ]
             
@@ -96,16 +96,3 @@ graph LR
     TF[Terraform] -- deploy --> GCP
     dev -- infrastructure changes --> TF
 ```
-
-
-# TODOs
-- [ ] Create a GitHub action to test the code on PRs
-- [ ] Create a GitHub action to build an image and push it to GCR on merge
-- [ ] Add Helm templates for the backend and frontend
-- [ ] Create a GitHub action to deploy the helm chart on merge
-- [ ] Create a GitHub action to deploy the terraform code on merge
-- [ ] Create a basic Data Fetcher
-- [ ] Create a dummy Data Analyzer
-- [ ] Create a Data Fetcher Cron Job Template in Helm Chart
-- [ ] Create a Data Analyzer Template in Helm Chart
-- [ ] ...
