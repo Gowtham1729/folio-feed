@@ -7,5 +7,6 @@ def index(request):
     return JsonResponse(
         {
             "message": "Hello, world!",
+            "status": "ok",
         }
     )
