@@ -6,6 +6,10 @@ on:
     paths:
       - "infrastructure/k8s/folio-feed-helm/**"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   GKE_CLUSTER: folio-feed-cluster
   GKE_LOCATION: us-central1
