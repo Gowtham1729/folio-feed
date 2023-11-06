@@ -26,6 +26,14 @@ jobs:
       with:
         token: ${{ secrets.PAT_TOKEN }}
 
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Set up Taskfile
+      uses: arduino/setup-task@v1.0.3
+
     - name: Run Lint Check
       run: task lint-check
 
@@ -40,9 +48,6 @@ jobs:
 
     - name: Docker configuration
       run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
-      
-    - name: Set up Taskfile
-      uses: arduino/setup-task@v1.0.3
 
     - name: Build
       run: task build-frontend-image tag="$GITHUB_SHA"
