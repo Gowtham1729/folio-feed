@@ -26,7 +26,13 @@ jobs:
       with:
         token: ${{ secrets.PAT_TOKEN }}
 
-    # Authentication via credentials json
+    - name: Run Lint Check
+      run: task lint-check
+
+    - name: Run all tests
+      run: task test
+
+    # Authentication to GCP via credentials json
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'
       with:

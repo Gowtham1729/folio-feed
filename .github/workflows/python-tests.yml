@@ -4,10 +4,10 @@
 name: Python Tests
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - "applications/**"
+#  push:
+#    branches: [ "main" ]
+#    paths:
+#      - "applications/**"
   pull_request:
     branches: [ "main" ]
     paths:

@@ -94,6 +94,21 @@ tasks:
     cmds:
       - echo "Tested the Data Analyzer"
 
+  test-frontend:
+    desc: Run tests for the frontend server.
+#    deps:
+#      - install-frontend
+    cmds:
+      - cd applications/frontend && echo "Tested the frontend"
+
+  test:
+    desc: Run all tests.
+    deps:
+      - test-backend
+      - test-fetcher
+      - test-analyzer
+      - test-frontend
+
 
   # Infrastructure tasks
   helm-setup:

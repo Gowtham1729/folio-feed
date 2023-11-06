@@ -26,7 +26,16 @@ jobs:
       with:
         token: ${{ secrets.PAT_TOKEN }}
 
-      # Authentication via credentials json
+    - name: Set up Taskfile
+      uses: arduino/setup-task@v1.0.3
+
+    - name: Run Lint Check
+      run: task lint-check
+
+    - name: Run all tests
+      run: task test
+
+      # Authentication to GCP via credentials json
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'
       with:
@@ -34,9 +43,6 @@ jobs:
 
     - name: Docker configuration
       run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
-      
-    - name: Set up Taskfile
-      uses: arduino/setup-task@v1.0.3
 
     - name: Build
       run: task build-backend-image tag="$GITHUB_SHA"
