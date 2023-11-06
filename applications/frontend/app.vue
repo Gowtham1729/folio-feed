@@ -4,7 +4,7 @@
     <h3>This nuxt js website is hosted on Google Cloud Platform</h3>
 
     <div>
-      <input v-model="userInput" placeholder="Please enter something..."/>
+      <input v-model="userInput" placeholder="Please enter something...."/>
 
       <button @click="addInputToList">OK</button>
     </div>

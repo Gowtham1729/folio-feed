@@ -6,6 +6,10 @@ on:
     paths:
       - "applications/frontend/**"
 
+concurrency:
+    group: build-group
+    cancel-in-progress: false
+
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GAR_LOCATION: us-central1
