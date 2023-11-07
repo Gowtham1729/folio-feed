@@ -18,6 +18,7 @@ tasks:
     desc: Run a postgresql server.
     cmds:
       - docker run -e POSTGRES_DB=folio-feed -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -v pg_data:/var/lib/postgresql/data postgres
+      - cd applications/backend/django_server && poetry run python manage.py migrate
 
   run-backend:
     desc: Run a debug backend server (Not used in production server).

@@ -14,6 +14,7 @@ backend:
 
   nodeSelector:
     cloud.google.com/gke-spot: "true"
+    cloud.google.com/compute-class: Scale-Out
 
   resources:
     # GKE Autopilot only considers requests. limits are same as requests.
@@ -36,6 +37,7 @@ frontend:
 
   nodeSelector:
     cloud.google.com/gke-spot: "true"
+    cloud.google.com/compute-class: Scale-Out
 
   resources:
     # GKE Autopilot only considers requests. limits are same as requests.
