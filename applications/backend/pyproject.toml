@@ -17,6 +17,8 @@ djangorestframework = "^3.14.0"
 markdown = "^3.5.1"
 django-filter = "^23.3"
 django-cors-headers = "^4.3.0"
+django-prometheus = "^2.3.1"
+prometheus-client = "^0.18.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.12.0"

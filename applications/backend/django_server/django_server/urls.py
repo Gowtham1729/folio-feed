@@ -21,6 +21,7 @@ from . import views
 
 urlpatterns = [
     path("api/admin/", admin.site.urls),
-    path("api/news/", include("news.urls")),
     path("healthz/", views.healthz, name="healthz"),
+    path("", include("django_prometheus.urls")),
+    path("api/news/", include("news.urls")),
 ]
