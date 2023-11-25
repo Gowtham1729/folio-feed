@@ -45,6 +45,12 @@ frontend:
       cpu: 250m
       memory: 512Mi
 
+fetcher:
+  image:
+    registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
+    repository: folio-feed-fetcher
+    tag: &fetcherImageTag latest
+
 
 
 

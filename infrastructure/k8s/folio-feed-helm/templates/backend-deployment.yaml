@@ -5,6 +5,9 @@ metadata:
   labels:
     {{- include "folio-feed.labels" . | nindent 4 }}
     app: backend
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '8000'
 spec:
   {{- if not .Values.backend.autoscaling.enabled }}
   replicas: {{ .Values.backend.replicaCount }}
