@@ -49,7 +49,7 @@ fetcher:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-fetcher
-    tag: &fetcherImageTag latest
+    tag: &fetcherImageTag a8bc423027065ef526317ba02c2e1bfa49c18bb7
 
 
 
