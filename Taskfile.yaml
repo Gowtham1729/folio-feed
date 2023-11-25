@@ -53,6 +53,27 @@ tasks:
     cmds:
       - cd applications/frontend && npm run dev
 
+  install-fetcher:
+    desc: Install poetry and dependencies for the Data Fetcher.
+    cmds:
+      - pip3 show poetry --quiet || pip3 install poetry
+      - cd applications/data-fetcher && poetry install
+
+  run-fetcher:
+    desc: Run the Data Fetcher.
+    deps:
+      - install-fetcher
+    cmds:
+      - cd applications/data_fetcher && poetry run python fetcher.py
+
+  build-fetcher-image:
+    desc: Build a Data Fetcher docker image.
+    cmd: cd applications/data_fetcher && docker build -t us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-fetcher:{{.tag}} .
+
+  push-fetcher-image:
+    desc: Push a Data Fetcher docker image to the image registry.
+    cmd: docker push us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-fetcher:{{.tag}}
+
   install-lint:
     desc: Install isort, black and mypy.
     cmds:

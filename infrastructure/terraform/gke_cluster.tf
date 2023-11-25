@@ -13,11 +13,11 @@ resource "google_container_cluster" "folio-feed-cluster" {
     }
     enable_components = [
       "SYSTEM_COMPONENTS",
-      "STORAGE",
-      "HPA",
-      "POD",
-      "DEPLOYMENT",
-      "STATEFULSET"
+#      "STORAGE",
+#      "HPA",
+#      "POD",
+#      "DEPLOYMENT",
+#      "STATEFULSET"
     ]
   }
 }

@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "data-fetcher"
+version = "0.1.0"
+description = ""
+authors = ["gowtham1729 <abc@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+click = "^8.1.7"
+psycopg = "^3.1.13"
+pika = "^1.3.2"
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.12.0"
+black = "^23.11.0"
+mypy = "^1.7.1"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+pytest-xdist = "^3.5.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

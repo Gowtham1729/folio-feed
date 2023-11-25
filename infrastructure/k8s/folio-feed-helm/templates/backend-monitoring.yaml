@@ -11,5 +11,5 @@ spec:
       {{- include "folio-feed.selectorLabels" . | nindent 6 }}
       app: backend
   endpoints:
-  - port: metrics
+  - port: http
     interval: 30s

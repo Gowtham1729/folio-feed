@@ -22,6 +22,6 @@ from . import views
 urlpatterns = [
     path("api/admin/", admin.site.urls),
     path("healthz/", views.healthz, name="healthz"),
-    path("", include("django_prometheus.urls")),
+    path("", include("django_prometheus.urls")),  # collect metrics at /metrics
     path("api/news/", include("news.urls")),
 ]

@@ -1,0 +1,73 @@
+name: Build Fetcher
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "applications/data_fetcher/**"
+
+concurrency:
+    group: build-group
+    cancel-in-progress: false
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GAR_LOCATION: us-central1
+
+jobs:
+  setup-build-publish:
+    name: Setup, Build, Publish
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Set up Taskfile
+      uses: arduino/setup-task@v1.0.3
+
+    - name: Run Lint Check
+      run: task lint-check
+
+    - name: Run all tests
+      run: task test
+
+      # Authentication to GCP via credentials json
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: Docker configuration
+      run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
+
+    - name: Build
+      run: task build-fetcher-image tag="$GITHUB_SHA"
+
+    # Push the Docker image to Google Artifact Registry
+    - name: Publish
+      run: task push-fetcher-image tag="$GITHUB_SHA"
+
+    - name: Replace Fetcher Image Tag
+      run: sed -i "s/\(&fetcherImageTag\) [^[:space:]]*/\1 $GITHUB_SHA/g" infrastructure/k8s/folio-feed-helm/values.yaml
+
+    - name: Commit the Changes
+      run: |
+        git config user.name "Github Actions"
+        git config user.email github-actions@github.com
+        git diff
+        git add infrastructure/k8s/folio-feed-helm/values.yaml
+        git commit -m "fetcher image update: $GITHUB_SHA"
+        git push origin main
