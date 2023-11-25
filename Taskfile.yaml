@@ -57,7 +57,7 @@ tasks:
     desc: Install poetry and dependencies for the Data Fetcher.
     cmds:
       - pip3 show poetry --quiet || pip3 install poetry
-      - cd applications/data-fetcher && poetry install
+      - cd applications/data_fetcher && poetry install
 
   run-fetcher:
     desc: Run the Data Fetcher.
@@ -108,6 +108,8 @@ tasks:
 
   test-fetcher:
     desc: Run tests for the Data Fetcher.
+    deps:
+      - install-fetcher
     cmds:
       - echo "Tested the Data Fetcher"
 
