@@ -116,7 +116,9 @@ class Fetcher:
             news += self.to_news(response_json["data"], tickers_list)
 
             while (
-                page < 25 and page < response_json["meta"]["found"] // response_json["meta"]["limit"]
+                page < 25
+                and page
+                < response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
                 page += 1
                 response = requests.get(f"{news_url}&page={page}")
