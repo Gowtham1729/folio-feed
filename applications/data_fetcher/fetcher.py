@@ -16,6 +16,7 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
 MARKETAUX_API_KEY = os.getenv("MARKETAUX_API_KEY", "demo")
+MAX_API_QUERIES = 100
 
 
 @dataclass
@@ -118,7 +119,7 @@ class Fetcher:
             logger.info(f"Total News: {response_json['meta']['found']}")
 
             while (
-                page < 25
+                page < MAX_API_QUERIES
                 and page
                 < response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
