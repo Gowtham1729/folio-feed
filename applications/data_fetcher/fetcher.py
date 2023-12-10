@@ -1,4 +1,3 @@
-import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime
@@ -6,6 +5,9 @@ from typing import Dict, List
 
 import psycopg
 import requests
+from utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
@@ -14,6 +16,7 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
 MARKETAUX_API_KEY = os.getenv("MARKETAUX_API_KEY", "demo")
+MAX_API_QUERIES = 100
 
 
 @dataclass
@@ -43,9 +46,7 @@ class Fetcher:
             user=DB_USER,
             password=DB_PASSWORD,
         )
-        self.marketaux_news_url = (
-            f"https://api.marketaux.com/v1/news/all?api_token={MARKETAUX_API_KEY}"
-        )
+        self.marketaux_news_url = f"https://api.marketaux.com/v1/news/all"
         self.cursor = self.connection.cursor()
 
     def get_tickers(self) -> List[Ticker]:
@@ -61,6 +62,7 @@ class Fetcher:
                         news_news 
                         (category, symbol, src, src_url, img_src_url, headline, summary, publish_time, sentiment) 
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT DO NOTHING
                         """,
                 (
                     item.category,
@@ -98,40 +100,55 @@ class Fetcher:
         return news
 
     def fetch_news(self):
-        logging.info(f"Fetching Tickers...")
+        logger.info(f"Fetching Tickers...")
         tickers = self.get_tickers()
         tickers_list = [ticker.ticker for ticker in tickers]
-        logging.info(f"Ticker List: {tickers_list}")
+        logger.info(f"Ticker List: {tickers_list}")
 
         ticker_symbols = ",".join(tickers_list)
         today_date = datetime.today().strftime("%Y-%m-%d")
         page = 1
-        news_url = f"{self.marketaux_news_url}&symbols={ticker_symbols}&published_on={today_date}"
+        news_url = f"{self.marketaux_news_url}?symbols={ticker_symbols}&published_on={today_date}"
 
-        logging.info(f"Fetching News...")
-        response = requests.get(f"{news_url}&page={page}")
+        logger.info(f"Fetching News from the URl {news_url} ...")
+        response = requests.get(f"{news_url}&page={page}&api_token={MARKETAUX_API_KEY}")
         news = []
         if response.status_code == 200:
             response_json = response.json()
             news += self.to_news(response_json["data"], tickers_list)
+            logger.info(f"Total News: {response_json['meta']['found']}")
 
             while (
-                page < 25
+                page < MAX_API_QUERIES
                 and page
                 < response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
                 page += 1
-                response = requests.get(f"{news_url}&page={page}")
+                logger.info(f"Fetching News from the URl {news_url}&page={page} ...")
+                response = requests.get(
+                    f"{news_url}&page={page}&api_token={MARKETAUX_API_KEY}"
+                )
                 if response.status_code == 200:
                     response_json = response.json()
                     news += self.to_news(response_json["data"], tickers_list)
                 else:
+                    logger.error(
+                        f"Error fetching news from the URL {news_url}&page={page}"
+                    )
+                    logger.error(f"Response: {response.json()}")
                     break
-        logging.info(f"Finished fetching News: {news}")
-        logging.info(f"Inserting News...")
+        else:
+            logger.error(f"Error fetching news from the URL {news_url}")
+            logger.error(f"Response: {response.json()}")
+
+        logger.info(f"Finished fetching News: {[n.headline for n in news]}")
+        logger.info(f"Inserting News...")
         self.insert_news(news)
 
 
 if __name__ == "__main__":
+    logger.info(f"Starting Fetcher...")
     fetcher = Fetcher()
+    logger.info(f"Fetcher Started...")
     fetcher.fetch_news()
+    logger.info(f"Fetcher Finished...")

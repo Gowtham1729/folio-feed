@@ -6,8 +6,8 @@ class News(models.Model):
     symbol = models.CharField(max_length=100)
 
     src = models.CharField(max_length=256)
-    src_url = models.URLField()
-    img_src_url = models.URLField()
+    src_url = models.URLField(max_length=500)
+    img_src_url = models.URLField(max_length=500)
 
     headline = models.TextField()
     summary = models.TextField()
@@ -16,12 +16,15 @@ class News(models.Model):
 
     sentiment = models.CharField(max_length=100)
 
+    class Meta:
+        unique_together = ("symbol", "headline")
+
     def __str__(self):
         return self.headline
 
 
 class Ticker(models.Model):
-    ticker = models.CharField(max_length=100)
+    ticker = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.ticker

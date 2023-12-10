@@ -22,6 +22,7 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /app
 COPY fetcher.py /app
+COPY utils/ /app/utils
 
 EXPOSE 8000
 
