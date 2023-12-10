@@ -101,7 +101,7 @@ tasks:
     cmds:
       - pip3 show black --quiet || pip3 install black==23.10.1
       - pip3 show isort --quiet|| pip3 install isort==5.12.0
-      - pip3 show mypy --quiet || pip3 install mypy==1.6.1
+      - pip3 show mypy --quiet || pip3 install mypy==1.6.1 types-requests==2.31.0.10
 
   lint-check:
     desc: Run isort, black and mypy on all files but only check.
@@ -110,7 +110,7 @@ tasks:
     cmds:
       - isort --check .
       - black --check .
-      - mypy --ignore-missing-imports .
+      - mypy --config-file tox.ini .
 
   lint:
     desc: Run isort, black and mypy on all files.
