@@ -4,7 +4,7 @@ backend:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-backend
-    tag: &backendImageTag e2e6661614ec1c8aa0445aad3dcf12887a3584d2
+    tag: &backendImageTag 8d655441c32e734c65fc35ca5d80936bbdd205c1
 
   replicaCount: 1
   autoscaling:
