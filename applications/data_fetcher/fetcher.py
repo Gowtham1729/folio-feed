@@ -98,17 +98,17 @@ class Fetcher:
         return news
 
     def fetch_news(self):
-        logging.log(f"Fetching Tickers...")
+        logging.info(f"Fetching Tickers...")
         tickers = self.get_tickers()
         tickers_list = [ticker.ticker for ticker in tickers]
-        logging.log(f"Ticker List: {tickers_list}")
+        logging.info(f"Ticker List: {tickers_list}")
 
         ticker_symbols = ",".join(tickers_list)
         today_date = datetime.today().strftime("%Y-%m-%d")
         page = 1
         news_url = f"{self.marketaux_news_url}&symbols={ticker_symbols}&published_on={today_date}"
 
-        logging.log(f"Fetching News...")
+        logging.info(f"Fetching News...")
         response = requests.get(f"{news_url}&page={page}")
         news = []
         if response.status_code == 200:
@@ -127,12 +127,11 @@ class Fetcher:
                     news += self.to_news(response_json["data"], tickers_list)
                 else:
                     break
-        logging.log(f"Finished fetching News: {news}")
-        logging.log(f"Inserting News...")
+        logging.info(f"Finished fetching News: {news}")
+        logging.info(f"Inserting News...")
         self.insert_news(news)
 
 
 if __name__ == "__main__":
     fetcher = Fetcher()
-    print("Hello")
     fetcher.fetch_news()
