@@ -39,4 +39,4 @@ spec:
                     secretKeyRef:
                       name: marketaux-api-secret
                       key: marketaux-api-secret-key
-              restartPolicy: OnFailure
+          restartPolicy: Never
