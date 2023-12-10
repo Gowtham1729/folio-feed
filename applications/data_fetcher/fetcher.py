@@ -1,4 +1,3 @@
-import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime
@@ -6,6 +5,9 @@ from typing import Dict, List
 
 import psycopg
 import requests
+from utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
@@ -98,17 +100,17 @@ class Fetcher:
         return news
 
     def fetch_news(self):
-        logging.info(f"Fetching Tickers...")
+        logger.info(f"Fetching Tickers...")
         tickers = self.get_tickers()
         tickers_list = [ticker.ticker for ticker in tickers]
-        logging.info(f"Ticker List: {tickers_list}")
+        logger.info(f"Ticker List: {tickers_list}")
 
         ticker_symbols = ",".join(tickers_list)
         today_date = datetime.today().strftime("%Y-%m-%d")
         page = 1
         news_url = f"{self.marketaux_news_url}&symbols={ticker_symbols}&published_on={today_date}"
 
-        logging.info(f"Fetching News...")
+        logger.info(f"Fetching News...")
         response = requests.get(f"{news_url}&page={page}")
         news = []
         if response.status_code == 200:
@@ -127,11 +129,14 @@ class Fetcher:
                     news += self.to_news(response_json["data"], tickers_list)
                 else:
                     break
-        logging.info(f"Finished fetching News: {news}")
-        logging.info(f"Inserting News...")
+        logger.info(f"Finished fetching News: {news}")
+        logger.info(f"Inserting News...")
         self.insert_news(news)
 
 
 if __name__ == "__main__":
+    logger.info(f"Starting Fetcher...")
     fetcher = Fetcher()
+    logger.info(f"Fetcher Started...")
     fetcher.fetch_news()
+    logger.info(f"Fetcher Finished...")
