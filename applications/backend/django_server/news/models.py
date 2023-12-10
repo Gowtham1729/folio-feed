@@ -16,12 +16,15 @@ class News(models.Model):
 
     sentiment = models.CharField(max_length=100)
 
+    class Meta:
+        unique_together = ("symbol", "headline")
+
     def __str__(self):
         return self.headline
 
 
 class Ticker(models.Model):
-    ticker = models.CharField(max_length=100)
+    ticker = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.ticker
