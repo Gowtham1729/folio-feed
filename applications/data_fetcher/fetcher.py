@@ -98,6 +98,7 @@ class Fetcher:
         return news
 
     def fetch_news(self):
+        logging.log(f"Fetching Tickers...")
         tickers = self.get_tickers()
         tickers_list = [ticker.ticker for ticker in tickers]
         logging.log(f"Ticker List: {tickers_list}")
@@ -115,7 +116,7 @@ class Fetcher:
             news += self.to_news(response_json["data"], tickers_list)
 
             while (
-                page < response_json["meta"]["found"] // response_json["meta"]["limit"]
+                page < 25 and page < response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
                 page += 1
                 response = requests.get(f"{news_url}&page={page}")
