@@ -6,7 +6,7 @@ metadata:
     {{- include "folio-feed.labels" . | nindent 4 }}
     app: fetcher
 spec:
-  schedule: "*/30 * * * *" # every 30 minutes
+  schedule: "30 23 * * *" # every day at 23:30 UTC
   jobTemplate:
     spec:
       template:
