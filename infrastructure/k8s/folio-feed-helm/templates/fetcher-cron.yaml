@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "folio-feed.fullname" . }}-fetcher
+  labels:
+    {{- include "folio-feed.labels" . | nindent 4 }}
+    app: fetcher
+spec:
+  schedule: "*/30 * * * *" # every 30 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: fetcher
+              {{- with .Values.fetcher.image }}
+              image: '{{- printf "%s/%s:%s" .registry .repository .tag}}'
+              {{- end}}
+              command:
+                - python
+                - fetcher.py
+                - fetch_data
+              env:
+                - name: DB_HOST
+                  value: folio-feed-postgresql.folio-feed.svc.cluster.local
+                - name: DB_PORT
+                  value: '5432'
+                - name: DB_NAME
+                  value: "folio-feed"
+                - name: DB_USER
+                  value: "postgres"
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql-password
+                      key: postgres-password
+                - name: MARKETAUX_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: marketaux-api-secret
+                      key: marketaux-api-secret-key
+              restartPolicy: OnFailure

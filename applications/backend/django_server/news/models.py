@@ -1,3 +1,27 @@
 from django.db import models
 
-# Create your models here.
+
+class News(models.Model):
+    category = models.CharField(max_length=100)
+    symbol = models.CharField(max_length=100)
+
+    src = models.CharField(max_length=256)
+    src_url = models.URLField()
+    img_src_url = models.URLField()
+
+    headline = models.TextField()
+    summary = models.TextField()
+
+    publish_time = models.DateTimeField()
+
+    sentiment = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.headline
+
+
+class Ticker(models.Model):
+    ticker = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.ticker
