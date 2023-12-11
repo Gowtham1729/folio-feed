@@ -121,7 +121,7 @@ class Fetcher:
             while (
                 page < MAX_API_QUERIES
                 and page
-                < response_json["meta"]["found"] // response_json["meta"]["limit"]
+                <= response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
                 page += 1
                 logger.info(f"Fetching News from the URl {news_url}&page={page} ...")
