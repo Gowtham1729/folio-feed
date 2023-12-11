@@ -52,6 +52,13 @@ fetcher:
     tag: &fetcherImageTag 25974037a6d0114f355c34dad8af93e70107fce7
 
 
+analyzer:
+  image:
+    registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
+    repository: folio-feed-analyzer
+    tag: &analyzerImageTag d4cf25ba7d33f750b9e9c2528530a6050ff01789
+
+
 
 
 rabbitmq:

@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "folio-feed.fullname" . }}-analyzer
+  labels:
+    {{- include "folio-feed.labels" . | nindent 4 }}
+    app: fetcher
+spec:
+  schedule: "50 23 * * *" # every day at 23:30 UTC
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: analyzer
+              {{- with .Values.analyzer.image }}
+              image: '{{- printf "%s/%s:%s" .registry .repository .tag}}'
+              {{- end}}
+              command:
+                - python
+                - analyzer.py
+                - analyze
+              env:
+                - name: DB_HOST
+                  value: folio-feed-postgresql.folio-feed.svc.cluster.local
+                - name: DB_PORT
+                  value: '5432'
+                - name: DB_NAME
+                  value: "folio-feed"
+                - name: DB_USER
+                  value: "postgres"
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql-password
+                      key: postgres-password
+          restartPolicy: Never
