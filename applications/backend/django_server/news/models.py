@@ -28,3 +28,24 @@ class Ticker(models.Model):
 
     def __str__(self):
         return self.ticker
+
+
+class Analysis(models.Model):
+    category = models.CharField(max_length=100)
+    symbol = models.CharField(max_length=100)
+
+    date = models.DateField()
+    average_sentiment = models.FloatField()
+    total_news = models.IntegerField()
+
+    positive_news = models.IntegerField()
+    negative_news = models.IntegerField()
+
+    need_attention = models.BooleanField()
+
+    class Meta:
+        unique_together = ("symbol", "date")
+
+    def __str__(self):
+        return f"{self.symbol} - {self.date}"
+
