@@ -40,6 +40,7 @@ class Analysis(models.Model):
 
     positive_news = models.IntegerField()
     negative_news = models.IntegerField()
+    neutral_news = models.IntegerField()
 
     need_attention = models.BooleanField()
 
