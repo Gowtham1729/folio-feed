@@ -74,6 +74,28 @@ tasks:
     desc: Push a Data Fetcher docker image to the image registry.
     cmd: docker push us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-fetcher:{{.tag}}
 
+  install-analyzer:
+    desc: Install poetry and dependencies for the Data Analyzer.
+    cmds:
+      - pip3 show poetry --quiet || pip3 install poetry
+      - cd applications/data_analyzer && poetry install
+
+  run-analyzer:
+    desc: Run the Data Analyzer.
+    deps:
+      - install-analyzer
+    cmds:
+      - cd applications/data_analyzer && poetry run python analyzer.py
+
+  build-analyzer-image:
+    desc: Build a Data Analyzer docker image.
+    cmd: cd applications/data_analyzer && docker build -t us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-analyzer:{{.tag}} .
+
+  push-analyzer-image:
+    desc: Push a Data Analyzer docker image to the image registry.
+    cmd: docker push us-central1-docker.pkg.dev/folio-feed-403709/image-registry/folio-feed-analyzer:{{.tag}}
+
+
   install-lint:
     desc: Install isort, black and mypy.
     cmds:
@@ -115,6 +137,8 @@ tasks:
 
   test-analyzer:
     desc: Run tests for the Data Analyzer.
+    deps:
+      - install-analyzer
     cmds:
       - echo "Tested the Data Analyzer"
 
