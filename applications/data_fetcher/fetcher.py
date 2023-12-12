@@ -129,7 +129,7 @@ class Fetcher:
             logger.info(f"Total News: {response_json['meta']['found']}")
 
             while (
-                page < 1
+                page < MAX_API_QUERIES
                 and page
                 <= response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
