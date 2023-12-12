@@ -7,8 +7,11 @@ metadata:
     app: fetcher
 spec:
   schedule: "50 23 * * *" # every day at 23:30 UTC
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         spec:
           volumes:
