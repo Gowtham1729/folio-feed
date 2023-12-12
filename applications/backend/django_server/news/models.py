@@ -5,16 +5,16 @@ class News(models.Model):
     category = models.CharField(max_length=100)
     symbol = models.CharField(max_length=100)
 
-    src = models.CharField(max_length=256)
-    src_url = models.URLField(max_length=500)
-    img_src_url = models.URLField(max_length=500)
+    src = models.CharField(max_length=2048)
+    src_url = models.URLField(max_length=2048)
+    img_src_url = models.URLField(max_length=2048)
 
     headline = models.TextField()
     summary = models.TextField()
 
     publish_time = models.DateTimeField()
 
-    sentiment = models.CharField(max_length=100)
+    sentiment = models.IntegerField()
 
     class Meta:
         unique_together = ("symbol", "headline")
