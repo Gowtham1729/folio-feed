@@ -12,6 +12,7 @@ pika = "^1.3.2"
 click = "^8.1.7"
 google-cloud-language = "^2.11.1"
 google-cloud-aiplatform = "^1.37.0"
+python-json-logger = "^2.0.7"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.12.0"
