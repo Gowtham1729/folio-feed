@@ -42,8 +42,8 @@ class Fetcher:
                         INSERT 
                         INTO 
                         news_news 
-                        (category, symbol, src, src_url, img_src_url, headline, summary, publish_time, sentiment) 
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        (category, symbol, src, src_url, img_src_url, headline, summary, publish_time, sentiment, need_attention, reason) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 0, false, null)
                         ON CONFLICT DO NOTHING
                         """,
                 (
@@ -55,7 +55,6 @@ class Fetcher:
                     item.headline,
                     item.summary,
                     item.publish_time,
-                    item.sentiment,
                 ),
             )
         self.connection.commit()
@@ -76,7 +75,9 @@ class Fetcher:
                         headline=item.get("title"),
                         summary=item.get("description"),
                         publish_time=item.get("published_at"),
-                        sentiment=item.get("sentiment_score", 0),
+                        sentiment=0,
+                        need_attention=False,
+                        reason=None,
                     )
                 )
         return news

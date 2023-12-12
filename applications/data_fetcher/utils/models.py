@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -17,3 +18,5 @@ class News:
     summary: str
     publish_time: str
     sentiment: int
+    need_attention: bool
+    reason: Optional[str]
