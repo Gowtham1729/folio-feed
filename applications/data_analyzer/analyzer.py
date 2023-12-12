@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from typing import List, Optional, Tuple
 
+import pika
 import psycopg
 from utils.logging import get_logger
 from utils.models import Analysis, News
@@ -16,6 +17,12 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "folio-feed")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
+
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
+RABBITMQ_PORT = os.getenv("RABBITMQ_PORT", "5672")
+RABBITMQ_USERNAME = os.getenv("RABBITMQ_USERNAME", "guest")
+RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD", "guest")
+RABBITMQ_QUEUE = os.getenv("RABBITMQ_QUEUE", "news")
 
 GCP_PROJECT = os.getenv("GCP_PROJECT", "folio-feed-403709")
 GCP_LOCATION = os.getenv("GCP_LOCATION", "us-central1")
@@ -99,6 +106,45 @@ class Analyzer:
             )
             for item in self.cursor.fetchall()
         ]
+
+    def fetch_news(self, id_: int) -> News:
+        self.cursor.execute(
+            """
+            SELECT
+                id,
+                category,
+                symbol,
+                src,
+                src_url,
+                img_src_url,
+                headline,
+                summary,
+                publish_time,
+                sentiment,
+                need_attention,
+                reason
+            FROM
+                news_news
+            WHERE
+                id = %s
+            """,
+            (id_,),
+        )
+        item = self.cursor.fetchone()
+        return News(
+            id=item[0],
+            category=item[1],
+            symbol=item[2],
+            src=item[3],
+            src_url=item[4],
+            img_src_url=item[5],
+            headline=item[6],
+            summary=item[7],
+            publish_time=item[8],
+            sentiment=item[9],
+            need_attention=item[10],
+            reason=item[11],
+        )
 
     def analyze_symbol(self, symbol: str, news: List[News]) -> Analysis:
         return Analysis(
@@ -186,6 +232,74 @@ class Analyzer:
             time.sleep(5)
             return 0, False, None
 
+    def update_daily_analysis(self, news: News, date: str):
+        self.cursor.execute(
+            """
+            INSERT INTO news_analysis
+            (category, symbol, date, average_sentiment, total_news, positive_news, negative_news, neutral_news, need_attention)
+            VALUES (%s, %s, %s, %s, 1, %s, %s, %s, %s)
+            ON CONFLICT DO NOTHING
+            """,
+            (
+                news.category,
+                news.symbol,
+                date,
+                0,
+                0,
+                0,
+                0,
+                False,
+            ),
+        )
+
+        self.cursor.execute(
+            """
+            UPDATE news_analysis
+            SET 
+                average_sentiment = (SELECT AVG(sentiment) FROM news_news), 
+                total_news = total_news + 1, 
+                positive_news = positive_news + %s, 
+                negative_news = negative_news + %s, 
+                neutral_news = neutral_news + %s, 
+                need_attention = need_attention OR %s
+            WHERE symbol = %s AND date = %s
+            """,
+            (
+                1 if news.sentiment > 0 else 0,
+                1 if news.sentiment < 0 else 0,
+                1 if news.sentiment == 0 else 0,
+                True if news.need_attention else False,
+                news.symbol,
+                date,
+            ),
+        )
+        self.connection.commit()
+
+    def analyze_news(self, ch, method, properties, body: str):
+        body_dict = json.loads(body)
+        id_ = body_dict.get("id")
+        date = body_dict.get("date")
+        if not date or not id_:
+            logger.error(f"Invalid Input: {body}")
+            return
+
+        logger.info(f"Analyzing News...")
+        news = self.fetch_news(id_)
+        sentiment, need_attention, reason = self.ai_analysis(news)
+        news.sentiment = sentiment
+        news.need_attention = need_attention
+        news.reason = reason
+        logger.info(f"News Analysis: {news}")
+
+        logger.info(f"Updating AI Analysis...")
+        self.update_ai_news_analysis([news])
+        logger.info(f"AI Analysis Updated!")
+
+        logger.info(f"Updating {news.symbol} Analysis on date {date}...")
+        self.update_daily_analysis(news, date)
+        logger.info(f"Analysis Updated!")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+
     def analyze(self):
         logger.info(f"Fetching all News...")
         all_news = self.get_today_news()
@@ -218,4 +332,23 @@ class Analyzer:
 
 if __name__ == "__main__":
     analyzer = Analyzer()
-    analyzer.analyze()
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            host=RABBITMQ_HOST,
+            port=RABBITMQ_PORT,
+            credentials=pika.PlainCredentials(
+                username=RABBITMQ_USERNAME, password=RABBITMQ_PASSWORD
+            ),
+        )
+    )
+    channel = connection.channel()
+    channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
+    channel.basic_consume(
+        queue=RABBITMQ_QUEUE,
+        on_message_callback=lambda ch, method, properties, body: analyzer.analyze_news(
+            ch, method, properties, body
+        ),
+        auto_ack=False,
+    )
+    logger.info(f"Waiting for news...")
+    channel.start_consuming()
