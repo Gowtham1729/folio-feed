@@ -14,7 +14,9 @@ class News(models.Model):
 
     publish_time = models.DateTimeField()
 
-    sentiment = models.IntegerField()
+    sentiment = models.IntegerField(default=0)
+    need_attention = models.BooleanField(default=False)
+    reason = models.TextField(null=True)
 
     class Meta:
         unique_together = ("symbol", "headline")
