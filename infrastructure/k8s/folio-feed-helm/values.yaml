@@ -2,7 +2,7 @@ environment: "prod"
 
 gcp:
   project: folio-feed-403709
-  region: us-central1
+  location: us-central1
 
 backend:
   image:

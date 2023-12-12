@@ -52,5 +52,5 @@ spec:
                 - name: MODEL_NAME
                   value: {{ .Values.analyzer.modelName }}
                 - name: GOOGLE_APPLICATION_CREDENTIALS
-                  value: /var/secrets/google/key.json
+                  value: /var/secrets/google/vertex-ai-key.json
           restartPolicy: Never
