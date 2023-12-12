@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -8,6 +9,7 @@ class Ticker:
 
 @dataclass
 class News:
+    id: int
     category: str
     symbol: str
     src: str
@@ -16,7 +18,9 @@ class News:
     headline: str
     summary: str
     publish_time: str
-    sentiment: str
+    sentiment: int
+    need_attention: bool
+    reason: Optional[str]
 
 
 @dataclass

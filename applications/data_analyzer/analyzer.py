@@ -1,10 +1,13 @@
 import os
 from datetime import datetime
-from typing import List
+from typing import List, Tuple, Optional
 
 import psycopg
+import time
+import json
 from utils.logging import get_logger
 from utils.models import Analysis, News
+from vertexai.language_models import TextGenerationModel
 
 logger = get_logger(__name__)
 
@@ -13,6 +16,35 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "folio-feed")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
+
+GCP_PROJECT = os.getenv("GCP_PROJECT", "folio-feed-403709")
+GCP_LOCATION = os.getenv("GCP_LOCATION", "us-central1")
+MODEL_NAME = os.getenv("MODEL_NAME", "text-bison")
+MODEL_PARAMETERS = {
+    "candidate_count": 1,
+    "max_output_tokens": 1024,
+    "temperature": 1,
+    "top_k": 40,
+}
+
+PROMPT = """"
+When you receive news data related to a stock, formatted as {"category": "str", "symbol": "str", "src": "str", "src_url": "str", "headline": "str", "summary": "str"}, you are to analyze this information and produce a single JSON response. The output should strictly follow the structure {"sentiment_score": "float", "need_attention": "bool", "reason": "str"} and must adhere to these guidelines:
+
+The sentiment score should range between -1 and 1, where -1 is highly negative, 0 is neutral, and 1 is highly positive. This score should reflect the potential impact of the news on the stock's performance and public sentiment.
+
+The "need_attention" field should be a boolean (true or false). Set it to true if the news is likely to significantly influence the stock's performance or public perception. If set to true, provide a brief explanation in the "reason" field, outlining why this news item demands attention.
+
+If "need_attention" is false, the "reason" field should either be an empty string or a concise explanation of why the news is considered to have little or no impact.
+
+Ensure all JSON keys are in lowercase (e.g., "sentiment_score," "need_attention," "reason") for consistency.
+
+The output must only consist of this JSON structure, with no additional text or explanation outside the JSON response.
+
+Your response should be based solely on the content and context of the provided news data, avoiding external biases or assumptions.
+
+Analyze the given data and output only the following JSON structure:
+{"sentiment_score": float, "need_attention": bool, "reason": string}
+"""
 
 
 class Analyzer:
@@ -25,11 +57,13 @@ class Analyzer:
             password=DB_PASSWORD,
         )
         self.cursor = self.connection.cursor()
+        self.model = TextGenerationModel.from_pretrained(model_name=MODEL_NAME)
 
     def get_today_news(self) -> List[News]:
         self.cursor.execute(
             """
             SELECT
+                id,
                 category,
                 symbol,
                 src,
@@ -38,30 +72,35 @@ class Analyzer:
                 headline,
                 summary,
                 publish_time,
-                sentiment
+                sentiment,
+                need_attention,
+                reason
             FROM
                 news_news
             WHERE
                 symbol IN (SELECT ticker FROM news_ticker) AND 
-                DATE(publish_time) = CURRENT_DATE
+                DATE(publish_time) = CURRENT_DATE - INTERVAL '2 day'
             """,
         )
         return [
             News(
-                category=item[0],
-                symbol=item[1],
-                src=item[2],
-                src_url=item[3],
-                img_src_url=item[4],
-                headline=item[5],
-                summary=item[6],
-                publish_time=item[7],
-                sentiment=item[8],
+                id=item[0],
+                category=item[1],
+                symbol=item[2],
+                src=item[3],
+                src_url=item[4],
+                img_src_url=item[5],
+                headline=item[6],
+                summary=item[7],
+                publish_time=item[8],
+                sentiment=item[9],
+                need_attention=item[10],
+                reason=item[11],
             )
             for item in self.cursor.fetchall()
         ]
 
-    def analyze_news(self, symbol: str, news: List[News]) -> Analysis:
+    def analyze_symbol(self, symbol: str, news: List[News]) -> Analysis:
         return Analysis(
             category=news[0].category,
             symbol=symbol,
@@ -71,16 +110,16 @@ class Analyzer:
             positive_news=len([item for item in news if item.sentiment > 0]),
             negative_news=len([item for item in news if item.sentiment < 0]),
             neutral_news=len([item for item in news if item.sentiment == 0]),
-            need_attention=False,
+            need_attention=any([item for item in news if item.need_attention]),
         )
 
     def insert_analysis(self, analysis: List[Analysis]):
         self.cursor.executemany(
             """
             INSERT INTO news_analysis
-            (category, symbol, date, average_sentiment, total_news, positive_news, negative_news, need_attention)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT DO NOTHING
+            (category, symbol, date, average_sentiment, total_news, positive_news, negative_news, neutral_news, need_attention)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (symbol, date) DO UPDATE SET average_sentiment = EXCLUDED.average_sentiment, total_news = EXCLUDED.total_news, positive_news = EXCLUDED.positive_news, negative_news = EXCLUDED.negative_news, neutral_news = EXCLUDED.neutral_news, need_attention = EXCLUDED.need_attention
             """,
             [
                 (
@@ -91,12 +130,54 @@ class Analyzer:
                     item.total_news,
                     item.positive_news,
                     item.negative_news,
+                    item.neutral_news,
                     item.need_attention,
                 )
                 for item in analysis
             ],
         )
         self.connection.commit()
+
+    def update_ai_news_analysis(self, news: List[News]):
+        self.cursor.executemany(
+            """
+            UPDATE news_news
+            SET sentiment = %s, need_attention = %s, reason = %s
+            WHERE id = %s
+            """,
+            [
+                (
+                    item.sentiment,
+                    item.need_attention,
+                    item.reason,
+                    item.id,
+                )
+                for item in news
+            ],
+        )
+        self.connection.commit()
+
+    def ai_analysis(self, news: News) -> Tuple[float, bool, Optional[str]]:
+        query = (
+            f"""{PROMPT}
+            input: {{"category": "{news.category}", "symbol": "{news.symbol}", "src": "{news.src}", "src_url": "{news.src_url}", "headline": "{news.headline}", "summary": "{news.summary}"}}
+            output:
+            """
+        )
+        response = self.model.predict(query, **MODEL_PARAMETERS)
+        logger.info(f"Response: {response.text}")
+
+        try:
+            cleaned_response = response.text.replace('```', '').replace('JSON\n', '').replace('json\n', '').strip()
+            json_response = json.loads(cleaned_response)
+            logger.info(f"Response JSON Parse Success")
+            time.sleep(5)
+            return json_response["sentiment_score"], json_response["need_attention"], json_response["reason"]
+        except Exception as e:
+            logger.info(f"Response Parsing Failed")
+            logger.error(f"Error: {e}")
+            time.sleep(5)
+            return 0, False, None
 
     def analyze(self):
         logger.info(f"Fetching all News...")
@@ -108,9 +189,21 @@ class Analyzer:
                 news[item.symbol] = []
             news[item.symbol].append(item)
 
-        logger.info(f"Analyzing News...")
-        analysis = [self.analyze_news(symbol, news) for symbol, news in news.items()]
+        logger.info(f"News AI Analysis...")
+        for symbol, news_list in news.items():
+            for item in news_list:
+                sentiment, need_attention, reason = self.ai_analysis(item)
+                item.sentiment = sentiment
+                item.need_attention = need_attention
+                item.reason = reason
+
+        logger.info(f"Updating AI Analysis...")
+        self.update_ai_news_analysis(all_news)
+
+        logger.info(f"Analyzing Each Symbol...")
+        analysis = [self.analyze_symbol(symbol, news) for symbol, news in news.items()]
         logger.info(f"Analysis: {analysis}")
+
         logger.info(f"Inserting Analysis...")
         self.insert_analysis(analysis)
         logger.info(f"Analysis Finished!")
