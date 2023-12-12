@@ -79,7 +79,7 @@ class Analyzer:
                 news_news
             WHERE
                 symbol IN (SELECT ticker FROM news_ticker) AND 
-                DATE(publish_time) = CURRENT_DATE - INTERVAL '2 day'
+                DATE(publish_time) = CURRENT_DATE
             """,
         )
         return [
