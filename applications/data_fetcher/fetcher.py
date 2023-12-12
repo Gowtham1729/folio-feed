@@ -1,7 +1,9 @@
+import json
 import os
 from datetime import datetime
 from typing import Dict, List
 
+import pika
 import psycopg
 import requests
 from utils.logging import get_logger
@@ -15,8 +17,16 @@ DB_NAME = os.getenv("DB_NAME", "folio-feed")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
-MARKETAUX_API_KEY = os.getenv("MARKETAUX_API_KEY", "demo")
+MARKETAUX_API_KEY = os.getenv(
+    "MARKETAUX_API_KEY", "WCUoFK1UQ1ZvtCL7jlIVCTBkJHUDh7pDsPUAZdqV"
+)
 MAX_API_QUERIES = 100
+
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
+RABBITMQ_PORT = os.getenv("RABBITMQ_PORT", "5672")
+RABBITMQ_USERNAME = os.getenv("RABBITMQ_USERNAME", "guest")
+RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD", "guest")
+RABBITMQ_QUEUE = os.getenv("RABBITMQ_QUEUE", "news")
 
 
 class Fetcher:
@@ -30,12 +40,21 @@ class Fetcher:
         )
         self.marketaux_news_url = f"https://api.marketaux.com/v1/news/all"
         self.cursor = self.connection.cursor()
+        self.rabbitmq_connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=RABBITMQ_HOST,
+                port=RABBITMQ_PORT,
+                virtual_host="/",
+                credentials=pika.PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD),
+            )
+        )
 
     def get_tickers(self) -> List[Ticker]:
         self.cursor.execute("SELECT ticker FROM news_ticker")
         return [Ticker(ticker[0]) for ticker in self.cursor.fetchall()]
 
-    def insert_news(self, news: List[News]):
+    def insert_news(self, news: List[News]) -> List[int]:
+        ids = []
         for item in news:
             self.cursor.execute(
                 """
@@ -45,6 +64,7 @@ class Fetcher:
                         (category, symbol, src, src_url, img_src_url, headline, summary, publish_time, sentiment, need_attention, reason) 
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 0, false, null)
                         ON CONFLICT DO NOTHING
+                        RETURNING id
                         """,
                 (
                     item.category,
@@ -57,7 +77,14 @@ class Fetcher:
                     item.publish_time,
                 ),
             )
+            try:
+                id_of_new_row = self.cursor.fetchone()[0]
+                ids.append(id_of_new_row)
+            except TypeError:
+                logger.info(f"News already exists: {item.headline}")
+
         self.connection.commit()
+        return ids
 
     def to_news(self, items: Dict, tickers_list: List[str]) -> List[News]:
         news = []
@@ -102,7 +129,7 @@ class Fetcher:
             logger.info(f"Total News: {response_json['meta']['found']}")
 
             while (
-                page < MAX_API_QUERIES
+                page < 1
                 and page
                 <= response_json["meta"]["found"] // response_json["meta"]["limit"]
             ):
@@ -126,7 +153,17 @@ class Fetcher:
 
         logger.info(f"Finished fetching News: {[n.headline for n in news]}")
         logger.info(f"Inserting News...")
-        self.insert_news(news)
+        ids = self.insert_news(news)
+
+        logger.info(f"Sending News to RabbitMQ...")
+        channel = self.rabbitmq_connection.channel()
+        channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
+        for id_ in ids:
+            channel.basic_publish(
+                exchange="",
+                routing_key=RABBITMQ_QUEUE,
+                body=json.dumps({"id": id_, "date": today_date}),
+            )
 
 
 if __name__ == "__main__":
