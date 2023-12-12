@@ -1,5 +1,9 @@
 environment: "prod"
 
+gcp:
+  project: folio-feed-403709
+  region: us-central1
+
 backend:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
@@ -57,6 +61,7 @@ analyzer:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-analyzer
     tag: &analyzerImageTag d4cf25ba7d33f750b9e9c2528530a6050ff01789
+  modelName: "text-bison"
 
 
 

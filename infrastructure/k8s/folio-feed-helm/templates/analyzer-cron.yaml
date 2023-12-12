@@ -11,6 +11,10 @@ spec:
     spec:
       template:
         spec:
+          volumes:
+            - name: google-cloud-key
+              secret:
+                secretName: vertex-ai-key
           containers:
             - name: analyzer
               {{- with .Values.analyzer.image }}
@@ -20,6 +24,10 @@ spec:
                 - python
                 - analyzer.py
                 - analyze
+              volumeMounts:
+                - name: google-cloud-key
+                  mountPath: /var/secrets/google
+                  readOnly: true
               env:
                 - name: DB_HOST
                   value: folio-feed-postgresql.folio-feed.svc.cluster.local
@@ -34,4 +42,12 @@ spec:
                     secretKeyRef:
                       name: postgresql-password
                       key: postgres-password
+                - name: GCP_PROJECT
+                  value: {{ .Values.gcp.project }}
+                - name: GCP_LOCATION
+                  value: {{ .Values.gcp.location }}
+                - name: MODEL_NAME
+                  value: {{ .Values.analyzer.modelName }}
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /var/secrets/google/key.json
           restartPolicy: Never
