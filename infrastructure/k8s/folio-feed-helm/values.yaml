@@ -53,7 +53,7 @@ fetcher:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-fetcher
-    tag: &fetcherImageTag 34467c1a88fd808abcd01fb1ff5b6ea74535637d
+    tag: &fetcherImageTag 4bd0eb6d467033ebfe50555b88b3b7c0a49909a0
 
 
 analyzer:
@@ -62,6 +62,10 @@ analyzer:
     repository: folio-feed-analyzer
     tag: &analyzerImageTag 0a21a516a2177fadf7f113670928800d96f92d33
   modelName: "text-bison"
+
+  nodeSelector:
+    cloud.google.com/gke-spot: "true"
+    cloud.google.com/compute-class: Scale-Out
 
 
 
