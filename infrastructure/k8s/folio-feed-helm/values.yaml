@@ -73,7 +73,7 @@ analyzer:
 #rabbitmq:
 #  replicaCount: 1
 #  persistence:
-#    storageClass: "standard-rwo"
+#    storageClass: "premium-rwo"
 #    size: 5Gi
 #  nodeSelector:
 #    cloud.google.com/gke-spot: "true"
