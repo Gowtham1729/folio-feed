@@ -1,10 +1,10 @@
+import json
 import os
+import time
 from datetime import datetime
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import psycopg
-import time
-import json
 from utils.logging import get_logger
 from utils.models import Analysis, News
 from vertexai.language_models import TextGenerationModel
@@ -158,21 +158,28 @@ class Analyzer:
         self.connection.commit()
 
     def ai_analysis(self, news: News) -> Tuple[float, bool, Optional[str]]:
-        query = (
-            f"""{PROMPT}
+        query = f"""{PROMPT}
             input: {{"category": "{news.category}", "symbol": "{news.symbol}", "src": "{news.src}", "src_url": "{news.src_url}", "headline": "{news.headline}", "summary": "{news.summary}"}}
             output:
             """
-        )
         response = self.model.predict(query, **MODEL_PARAMETERS)
         logger.info(f"Response: {response.text}")
 
         try:
-            cleaned_response = response.text.replace('```', '').replace('JSON\n', '').replace('json\n', '').strip()
+            cleaned_response = (
+                response.text.replace("```", "")
+                .replace("JSON\n", "")
+                .replace("json\n", "")
+                .strip()
+            )
             json_response = json.loads(cleaned_response)
             logger.info(f"Response JSON Parse Success")
             time.sleep(5)
-            return json_response["sentiment_score"], json_response["need_attention"], json_response["reason"]
+            return (
+                json_response["sentiment_score"],
+                json_response["need_attention"],
+                json_response["reason"],
+            )
         except Exception as e:
             logger.info(f"Response Parsing Failed")
             logger.error(f"Error: {e}")
