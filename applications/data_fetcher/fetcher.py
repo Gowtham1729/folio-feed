@@ -1,11 +1,11 @@
 import os
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List
 
 import psycopg
 import requests
 from utils.logging import get_logger
+from utils.models import News, Ticker
 
 logger = get_logger(__name__)
 
@@ -17,24 +17,6 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
 MARKETAUX_API_KEY = os.getenv("MARKETAUX_API_KEY", "demo")
 MAX_API_QUERIES = 100
-
-
-@dataclass
-class Ticker:
-    ticker: str
-
-
-@dataclass
-class News:
-    category: str
-    symbol: str
-    src: str
-    src_url: str
-    img_src_url: str
-    headline: str
-    summary: str
-    publish_time: str
-    sentiment: str
 
 
 class Fetcher:
