@@ -70,13 +70,13 @@ analyzer:
 
 
 
-rabbitmq:
-  replicaCount: 1
-  persistence:
-    storageClass: "standard-rwo"
-    size: 5Gi
-  nodeSelector:
-    cloud.google.com/gke-spot: "true"
+#rabbitmq:
+#  replicaCount: 1
+#  persistence:
+#    storageClass: "standard-rwo"
+#    size: 5Gi
+#  nodeSelector:
+#    cloud.google.com/gke-spot: "true"
 
 postgresql:
   global:

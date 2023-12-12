@@ -28,6 +28,6 @@ dependencies:
   - name: postgresql
     version: 13.2.0
     repository: https://charts.bitnami.com/bitnami
-  - name: rabbitmq
-    version: 12.3.0
-    repository: https://charts.bitnami.com/bitnami
+#  - name: rabbitmq
+#    version: 12.3.0
+#    repository: https://charts.bitnami.com/bitnami
