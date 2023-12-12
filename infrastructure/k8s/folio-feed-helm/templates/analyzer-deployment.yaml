@@ -17,7 +17,6 @@ spec:
           {{- include "folio-feed.selectorLabels" . | nindent 8 }}
         app: analyzer
     spec:
-        serviceAccountName: {{ include "folio-feed.serviceAccountName" . }}-analyzer-service-account
         nodeSelector:
           {{- toYaml .Values.analyzer.nodeSelector | nindent 8 }}
 
