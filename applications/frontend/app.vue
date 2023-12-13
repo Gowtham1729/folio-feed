@@ -2,19 +2,14 @@
   <div>
     <h1>Welcome to the Folio Feed web application</h1>
     <h3>This nuxt js website is hosted on Google Cloud Platform</h3>
+    <button @click="showNews()">Test</button>
+    <div v-for="item in news" :key="item.id">
+      <h3>{{ item.symbol }}</h3>
+      <p>{{item.headline }}</p>
+      <div v-html="item.summary"></div>
+      <input type="checkbox" checked="checked" v-if="item.need_attention"> <span>Need attention</span>
+      </div>
 
-    <div>
-      <input v-model="userInput" placeholder="Please enter something...."/>
-
-      <button @click="addInputToList">OK</button>
-    </div>
-
-    <p><b>Echo: </b></p>
-    <ul>
-      <li v-for="(input, index) in inputsList" :key="index">
-        {{ input }}
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -22,29 +17,21 @@
 export default {
   data() {
     return {
-      userInput: '',
-      inputsList: [],
-    };
+      news: []
+    }
   },
   methods: {
-    addInputToList() {
-      if (this.userInput.trim()) {
-        this.inputsList.push(this.userInput);
-        this.userInput = '';
-      }
+    showNews() {
+      fetch('/api/news/news/?format=json')
+  .then(response => response.json())
+          .then(data => this.news = data)
+  .catch(error => console.error('Error:', error));
     }
   }
-};
+}
+
 </script>
 
 
 <style>
-button {
-  margin-left: 8px;
-}
-
-
-input {
-  margin-right: 8px;
-}
 </style>

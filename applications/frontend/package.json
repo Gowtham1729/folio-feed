@@ -16,7 +16,7 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
-    "axios": "^1.6.0",
+    "@nuxtjs/dotenv": "^1.4.1",
     "nuxt-security": "^1.0.0-rc.3"
   }
 }
