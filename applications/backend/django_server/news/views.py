@@ -1,5 +1,4 @@
 from django.utils import timezone
-
 from rest_framework import viewsets
 
 from .models import Analysis, News, Ticker
