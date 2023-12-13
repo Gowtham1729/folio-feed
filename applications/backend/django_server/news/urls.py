@@ -11,6 +11,6 @@ router.register(r"analysis", views.AnalysisViewSet)
 urlpatterns = [
     # path("", views.index, name="main_index"),
     path("api/", include(router.urls)),
-    path("home", views.home, name="home"),
-    path("news/<str:symbol>/<str:date>", views.news, name="news"),
+    path("", views.home, name="home"),
+    path("<str:symbol>/<str:date>", views.news, name="news"),
 ]

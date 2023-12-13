@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="">
-<head>
-    <title>Folio Feed</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
 <h1>Folio Feed</h1>
 
 <p>Your Tickers:</p>
@@ -29,5 +26,5 @@
 <p>Number of Neutral Articles: {{ analysis.neutral_news }}</p>
 <p> Need Attention: {{analysis.need_attention}}</p>
 {% endfor %}
-</body>
-</html>
+
+{% endblock %}

@@ -1,11 +1,37 @@
-<h1>{{symbol}} on {{date}}</h1>
+{% extends "base.html" %}
 
-{% for item in news %}
-<h2>{{item.headline}}</h2>
-<img src="{{item.img_src_url}}"/>
-<p>{{item.summary}}</p>
-<p>Source: <a href="{{item.src_url}}" target="_blank">{{item.src}}</a></p>
-<p>Sentiment: {{item.sentiment}}</p>
-<p>Need Attention: {{item.need_attention}}</p>
-<p>Why ? {{item.reason}}</p>
-{% endfor %}
+{% block content %}
+    <section class="py-5 text-center container">
+        <div class="row py-lg-5">
+            <div class="col-lg-6 col-md-8 mx-auto">
+                <h1 class="fw-light">{{date}}: {{symbol}}</h1>
+                <p class="lead text-muted"></p>
+            </div>
+        </div>
+    </section>
+
+    <div class="album py-5 bg-light">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for item in news %}
+                    <div class="col">
+                        <div class="card shadow-sm btn-group" role="button" onclick="window.open('{{ item.src_url }}')">
+
+                            <img class="bd-placeholder-img card-img-top" width="100%" height="225"
+                                 src="{{ item.img_src_url }}" alt="{{ item.headline }}"/>
+
+                            <div class="card-body">
+                                <p class="card-text">{{ item.summary }}</p>
+                                <div class="d-flex mb-lg-2 justify-content-between align-items-center">
+                                    <small class="text-muted ">- {{ item.src }}</small>
+                                    <small class="text-muted"> {{ item.publish_time }} </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -38,10 +38,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENV != "local":
-    DEBUG = False
-else:
-    DEBUG = True
+# if ENV != "local":
+#     DEBUG = False
+# else:
+DEBUG = True
 
 # FORCE_SCRIPT_NAME = "/api"
 ALLOWED_HOSTS = ["*"]
