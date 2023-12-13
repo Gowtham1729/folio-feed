@@ -60,10 +60,10 @@ spec:
               - name: GOOGLE_APPLICATION_CREDENTIALS
                 value: /var/secrets/google/vertex-ai-key.json
               - name: RABBITMQ_HOST
-                value: folio-feed-rabbitmq.folio-feed.svc.cluster.local
+                value: folio-feed-rabbitmq.rabbitmq.svc.cluster.local
               - name: RABBITMQ_PORT
                 value: '5672'
-              - name: RABBITMQ_USER
+              - name: RABBITMQ_USERNAME
                 value: "user"
               - name: RABBITMQ_PASSWORD
                 valueFrom:
@@ -72,4 +72,6 @@ spec:
                     key: rabbitmq-password
               - name: RABBITMQ_QUEUE
                 value: news
+            resources:
+              {{- toYaml .Values.analyzer.resources | nindent 12 }}
 

@@ -14,6 +14,8 @@ spec:
       backoffLimit: 0
       template:
         spec:
+          nodeSelector:
+            {{- toYaml .Values.fetcher.nodeSelector | nindent 10 }}
           containers:
             - name: fetcher
               {{- with .Values.fetcher.image }}
@@ -42,9 +44,11 @@ spec:
                     secretKeyRef:
                       name: marketaux-api-secret
                       key: marketaux-api-secret-key
+                - name: RABBITMQ_HOST
+                  value: folio-feed-rabbitmq.rabbitmq.svc.cluster.local
                 - name: RABBITMQ_PORT
                   value: '5672'
-                - name: RABBITMQ_USER
+                - name: RABBITMQ_USERNAME
                   value: "user"
                 - name: RABBITMQ_PASSWORD
                   valueFrom:
@@ -53,4 +57,6 @@ spec:
                       key: rabbitmq-password
                 - name: RABBITMQ_QUEUE
                   value: news
+              resources:
+                {{- toYaml .Values.fetcher.resources | nindent 14 }}
           restartPolicy: Never

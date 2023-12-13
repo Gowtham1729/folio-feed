@@ -55,6 +55,16 @@ fetcher:
     repository: folio-feed-fetcher
     tag: &fetcherImageTag 4bd0eb6d467033ebfe50555b88b3b7c0a49909a0
 
+  nodeSelector:
+    cloud.google.com/gke-spot: "true"
+    cloud.google.com/compute-class: Scale-Out
+
+  resources:
+    # GKE Autopilot only considers requests. limits are same as requests.
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 
 analyzer:
   image:
@@ -67,16 +77,33 @@ analyzer:
     cloud.google.com/gke-spot: "true"
     cloud.google.com/compute-class: Scale-Out
 
+  resources:
+    # GKE Autopilot only considers requests. limits are same as requests.
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 
 
 
 rabbitmq:
+  namespaceOverride: "rabbitmq"
   replicaCount: 1
   persistence:
     storageClass: "premium-rwo"
     size: 5Gi
   nodeSelector:
     cloud.google.com/gke-spot: "true"
+    cloud.google.com/compute-class: Scale-Out
+  auth:
+    username: user
+    existingPasswordSecret: folio-feed-rabbitmq
+    existingErlangCookieSecret: folio-feed-rabbitmq
+  resources:
+    # GKE Autopilot only considers requests. limits are same as requests.
+    requests:
+      cpu: 250m
+      memory: 512Mi
 
 postgresql:
   global:
