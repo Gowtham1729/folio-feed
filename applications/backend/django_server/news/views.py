@@ -4,11 +4,19 @@ from django.shortcuts import render
 from django.utils import timezone
 from rest_framework import viewsets
 
+from .forms import TickerForm
 from .models import Analysis, News, Ticker
 from .serializers import AnalysisSerializer, NewsSerializer, TickerSerializer
 
 
 def home(request):
+    if request.method == "POST":
+        form = TickerForm(request.POST)
+        if form.is_valid():
+            Ticker.objects.create(ticker=form.cleaned_data["ticker"])
+    else:
+        form = TickerForm()
+
     tickers = Ticker.objects.all()
     analysis = Analysis.objects.all().filter(
         date=datetime.now().date() - timedelta(days=1)
@@ -20,6 +28,7 @@ def home(request):
             "date": datetime.now().date() - timedelta(days=1),
             "tickers": tickers,
             "analysis_items": analysis,
+            "form": form,
         },
     )
 
