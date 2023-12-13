@@ -25,6 +25,9 @@ backend:
     requests:
       cpu: 250m
       memory: 512Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 
 
 frontend:
@@ -48,6 +51,9 @@ frontend:
     requests:
       cpu: 250m
       memory: 512Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 
 fetcher:
   image:
@@ -62,6 +68,9 @@ fetcher:
   resources:
     # GKE Autopilot only considers requests. limits are same as requests.
     requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
       cpu: 250m
       memory: 512Mi
 
@@ -80,6 +89,9 @@ analyzer:
   resources:
     # GKE Autopilot only considers requests. limits are same as requests.
     requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
       cpu: 250m
       memory: 512Mi
 
@@ -104,6 +116,9 @@ rabbitmq:
     requests:
       cpu: 250m
       memory: 512Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 
 postgresql:
   global:
@@ -122,4 +137,5 @@ postgresql:
       size: 10Gi
 
     nodeSelector:
-        cloud.google.com/gke-spot: "true"
+      cloud.google.com/gke-spot: "true"
+      cloud.google.com/compute-class: Scale-Out
