@@ -15,7 +15,7 @@ spec:
       template:
         spec:
           nodeSelector:
-            {{- toYaml .Values.fetcher.nodeSelector | nindent 10 }}
+            {{- toYaml .Values.fetcher.nodeSelector | nindent 12 }}
           containers:
             - name: fetcher
               {{- with .Values.fetcher.image }}
@@ -58,5 +58,5 @@ spec:
                 - name: RABBITMQ_QUEUE
                   value: news
               resources:
-                {{- toYaml .Values.fetcher.resources | nindent 14 }}
+                {{- toYaml .Values.fetcher.resources | nindent 16 }}
           restartPolicy: Never
