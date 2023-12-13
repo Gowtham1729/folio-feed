@@ -3,7 +3,8 @@
 {% for item in news %}
 <h2>{{item.headline}}</h2>
 <img src="{{item.img_src_url}}"/>
-<p>{{item.summary}} <a href="{{item.src_url}}">{{more}}</a></p>
+<p>{{item.summary}}</p>
+<p>Source: <a href="{{item.src_url}}" target="_blank">{{item.src}}</a></p>
 <p>Sentiment: {{item.sentiment}}</p>
 <p>Need Attention: {{item.need_attention}}</p>
 <p>Why ? {{item.reason}}</p>
