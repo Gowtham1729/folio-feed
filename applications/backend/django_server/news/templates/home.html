@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Folio Feed</title>
+</head>
+<body>
+<h1>Folio Feed</h1>
+
+<p>Your Tickers:</p>
+<ul>
+{% for ticker in tickers %}
+    <li>{{ ticker }}</li>
+{% endfor %}
+</ul>
+
+<p>Here is news analysis for {{date}}:</p>
+{% for analysis in analysis_items %}
+<h2><a href="{% url 'news' analysis.symbol date %}">{{ analysis.symbol }}</a></h2>
+    <p>Avg Sentiment: {{ analysis.average_sentiment }}</p>
+    <p>Number of Articles: {{ analysis.total_news }}</p>
+    <p>Number of Positive Articles: {{ analysis.positive_news }}</p>
+    <p>Number of Negative Articles: {{ analysis.negative_news }}</p>
+    <p>Number of Neutral Articles: {{ analysis.neutral_news }}</p>
+    <p> Need Attention: {{analysis.need_attention}}</p>
+{% endfor %}
+</body>
+</html>

@@ -20,8 +20,8 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path("api/admin/", admin.site.urls),
+    path("admin/", admin.site.urls),
     path("healthz/", views.healthz, name="healthz"),
     path("", include("django_prometheus.urls")),  # collect metrics at /metrics
-    path("api/news/", include("news.urls")),
+    path("news/", include("news.urls")),
 ]

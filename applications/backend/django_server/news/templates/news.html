@@ -1,0 +1,10 @@
+<h1>{{symbol}} on {{date}}</h1>
+
+{% for item in news %}
+<h2>{{item.headline}}</h2>
+<img src="{{item.img_src_url}}"/>
+<p>{{item.summary}} <a href="{{item.src_url}}">{{more}}</a></p>
+<p>Sentiment: {{item.sentiment}}</p>
+<p>Need Attention: {{item.need_attention}}</p>
+<p>Why ? {{item.reason}}</p>
+{% endfor %}
