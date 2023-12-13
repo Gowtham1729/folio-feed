@@ -27,28 +27,6 @@ backend:
       memory: 512Mi
 
 
-frontend:
-  image:
-    registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
-    repository: folio-feed-frontend
-    tag: &frontendImageTag aac17e42ad16314b40dca22cffbf6ac76457adb4
-
-  replicaCount: 1
-  autoscaling:
-      enabled: false
-      minReplicas: 1
-      maxReplicas: 3
-
-  nodeSelector:
-    cloud.google.com/gke-spot: "true"
-    cloud.google.com/compute-class: Scale-Out
-
-  resources:
-    # GKE Autopilot only considers requests. limits are same as requests.
-    requests:
-      cpu: 250m
-      memory: 512Mi
-
 fetcher:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry

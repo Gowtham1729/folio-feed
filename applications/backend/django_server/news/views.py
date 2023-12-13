@@ -1,7 +1,8 @@
+from datetime import datetime, timedelta
+
+from django.shortcuts import render
 from django.utils import timezone
 from rest_framework import viewsets
-from datetime import datetime, timedelta
-from django.shortcuts import render
 
 from .models import Analysis, News, Ticker
 from .serializers import AnalysisSerializer, NewsSerializer, TickerSerializer
@@ -9,15 +10,17 @@ from .serializers import AnalysisSerializer, NewsSerializer, TickerSerializer
 
 def home(request):
     tickers = Ticker.objects.all()
-    analysis = Analysis.objects.all().filter(date=datetime.now().date() - timedelta(days=1))
+    analysis = Analysis.objects.all().filter(
+        date=datetime.now().date() - timedelta(days=1)
+    )
     return render(
         request,
         "home.html",
         {
-            'date': datetime.now().date() - timedelta(days=1),
-            'tickers': tickers,
-            'analysis_items': analysis,
-        }
+            "date": datetime.now().date() - timedelta(days=1),
+            "tickers": tickers,
+            "analysis_items": analysis,
+        },
     )
 
 
@@ -28,11 +31,12 @@ def news(request, symbol, date):
         request,
         "news.html",
         {
-            'date': date,
-            'symbol': symbol,
-            'news': news,
-        }
+            "date": date,
+            "symbol": symbol,
+            "news": news,
+        },
     )
+
 
 class NewsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = News.objects.all()

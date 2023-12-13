@@ -17,13 +17,6 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ include "folio-feed.fullname" . }}-frontend
-                port:
-                  number: 80
-          - path: /api/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
                 name: {{ include "folio-feed.fullname" . }}-backend
                 port:
                   number: 80
