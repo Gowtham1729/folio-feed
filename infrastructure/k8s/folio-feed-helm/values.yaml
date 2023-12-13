@@ -31,7 +31,7 @@ frontend:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-frontend
-    tag: &frontendImageTag ea14134181209883af6d997a2a107936a7663323
+    tag: &frontendImageTag aac17e42ad16314b40dca22cffbf6ac76457adb4
 
   replicaCount: 1
   autoscaling:
