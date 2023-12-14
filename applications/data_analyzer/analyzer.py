@@ -237,13 +237,14 @@ class Analyzer:
             """
             INSERT INTO news_analysis
             (category, symbol, date, average_sentiment, total_news, positive_news, negative_news, neutral_news, need_attention)
-            VALUES (%s, %s, %s, %s, 1, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT DO NOTHING
             """,
             (
                 news.category,
                 news.symbol,
                 date,
+                0,
                 0,
                 0,
                 0,
