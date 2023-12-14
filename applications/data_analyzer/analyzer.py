@@ -151,7 +151,7 @@ class Analyzer:
             category=news[0].category,
             symbol=symbol,
             date=datetime.now().date().isoformat(),
-            average_sentiment=sum([item.sentiment for item in news]) / len(news),
+            average_sentiment=sum([item.sentiment for item in news if item.sentiment != 0]) / len(news),
             total_news=len(news),
             positive_news=len([item for item in news if item.sentiment > 0]),
             negative_news=len([item for item in news if item.sentiment < 0]),
@@ -256,7 +256,7 @@ class Analyzer:
             """
             UPDATE news_analysis
             SET 
-                average_sentiment = (SELECT AVG(sentiment) FROM news_news), 
+                average_sentiment = (SELECT AVG(sentiment) FROM news_news WHERE sentiment!=0), 
                 total_news = total_news + 1, 
                 positive_news = positive_news + %s, 
                 negative_news = negative_news + %s, 
