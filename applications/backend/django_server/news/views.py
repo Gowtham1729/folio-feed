@@ -10,6 +10,28 @@ from .serializers import AnalysisSerializer, NewsSerializer, TickerSerializer
 
 
 def home(request):
+    three_days_ago = datetime.now().date() - timedelta(days=3)
+    analysis = (
+        Analysis.objects.all()
+        .filter(date__gte=three_days_ago)
+        .order_by("-date", "-total_news", "symbol")
+    )
+    analysis_dict = {}
+    for a in analysis:
+        if a.date not in analysis_dict:
+            analysis_dict[a.date] = []
+        analysis_dict[a.date].append(a)
+
+    return render(
+        request,
+        "home.html",
+        {
+            "analysis_dict": analysis_dict,
+        },
+    )
+
+
+def tickers(request):
     if request.method == "POST":
         form = TickerForm(request.POST)
         if form.is_valid():
@@ -18,16 +40,11 @@ def home(request):
         form = TickerForm()
 
     tickers = Ticker.objects.all()
-    analysis = Analysis.objects.all().filter(
-        date=datetime.now().date() - timedelta(days=1)
-    )
     return render(
         request,
-        "home.html",
+        "tickers.html",
         {
-            "date": datetime.now().date() - timedelta(days=1),
             "tickers": tickers,
-            "analysis_items": analysis,
             "form": form,
         },
     )
@@ -35,7 +52,11 @@ def home(request):
 
 def news(request, symbol, date):
     date = timezone.datetime.strptime(date, "%Y-%m-%d").date()
-    news = News.objects.all().filter(symbol=symbol, publish_time__date=date)
+    news = (
+        News.objects.all()
+        .filter(symbol=symbol, publish_time__date=date)
+        .order_by("-publish_time")
+    )
     return render(
         request,
         "news.html",

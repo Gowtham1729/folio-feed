@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 pt-5">
+    <h5>Your Tickers:</h5>
+    <ul class="list-group mb-4">
+        {% for ticker in tickers %}
+        <li class="list-group-item">{{ ticker }}</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{form}}
+        </div>
+        <input type="submit" value="Add Ticker" class="btn btn-primary">
+    </form>
+</div>
+{% endblock %}

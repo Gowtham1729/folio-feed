@@ -13,4 +13,5 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("", views.home, name="home"),
     path("<str:symbol>/<str:date>", views.news, name="news"),
+    path("tickers/", views.tickers, name="tickers"),
 ]

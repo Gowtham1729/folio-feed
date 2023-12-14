@@ -1,37 +1,143 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <section class="py-5 text-center container">
-        <div class="row py-lg-5">
-            <div class="col-lg-6 col-md-8 mx-auto">
-                <h1 class="fw-light">{{date}}: {{symbol}}</h1>
-                <p class="lead text-muted"></p>
-            </div>
+<section class="py-5 text-center container">
+    <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">{{date}}: {{symbol}}</h1>
+            <p class="lead text-muted"></p>
         </div>
-    </section>
+    </div>
+</section>
 
-    <div class="album py-5 bg-light">
-        <div class="container">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                {% for item in news %}
-                    <div class="col">
-                        <div class="card shadow-sm btn-group" role="button" onclick="window.open('{{ item.src_url }}')">
-
-                            <img class="bd-placeholder-img card-img-top" width="100%" height="225"
-                                 src="{{ item.img_src_url }}" alt="{{ item.headline }}"/>
-
-                            <div class="card-body">
-                                <p class="card-text">{{ item.summary }}</p>
-                                <div class="d-flex mb-lg-2 justify-content-between align-items-center">
-                                    <small class="text-muted ">- {{ item.src }}</small>
-                                    <small class="text-muted"> {{ item.publish_time }} </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-
+<!-- Modal Structure -->
+<div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newsModalLabel">News Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- News Details -->
+                <p id="reason"></p>
+                <p id="summary"></p>
+                <!-- Add more elements as needed -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a id="readButton" class="btn btn-primary" href="#" target="_blank">Read</a>
             </div>
         </div>
     </div>
+</div>
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for item in news %}
+            <div class="col">
+
+                <div class="card shadow-sm btn-group hover-card {% if item.need_attention %}border border-danger thick-border{% endif %}"
+                     role="button" data-bs-toggle="modal" data-bs-target="#newsModal"
+                     data-headline="{{ item.headline }}" data-summary="{{ item.summary }}"
+                     data-reason="{{ item.reason }}" data-src-url="{{item.src_url}}">
+
+                    <img class="bd-placeholder-img card-img-top" width="100%" height="225"
+                         src="{{ item.img_src_url }}" alt="{{ item.headline }}"/>
+
+                    <div class="card-body d-flex flex-column justify-content-between ">
+                        <p><strong>{{item.headline}}</strong></p>
+
+                        <div class="mt-auto d-flex flex-column">
+                            <div class="mt-auto d-flex">
+                            <span class="badge {% if item.sentiment < 0 %}bg-danger{% elif item.sentiment == 0 %}bg-secondary{% else %}bg-success{% endif %}">
+                                Impact: {% if item.sentiment < 0 %}Negative{% elif item.sentiment == 0 %}Neutral{% else %}Positive{% endif %}
+                            </span>
+                                <span class="badge {% if item.sentiment < 0 %}bg-danger{% elif item.sentiment == 0 %}bg-secondary{% else %}bg-success{% endif %}">
+                                Score: {% if item.sentiment < 0 %}{{item.sentiment}}/1{% elif item.sentiment == 0 %}{{item.sentiment}}/1{% else %}{{item.sentiment}}/1{% endif %}
+                            </span>
+                                {% if item.need_attention %}
+                                <span class="badge bg-info">Read Recommendation</span>
+                                {%endif%}
+                            </div>
+                            <div class="mt-auto d-flex justify-content-between">
+                                <small class="text-muted">{{ item.src }}</small>
+                                <small class="text-muted publish-time"> {{ item.publish_time }} </small>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+<style>
+    .card-body {
+        height: 200px;
+        overflow: auto;
+    }
+
+    .hover-card {
+        transition: transform .2s;
+    }
+
+    .hover-card:hover {
+        transform: scale(1.02);
+    }
+
+    .thick-border {
+        border-width: 2px !important;
+    }
+
+    .publish-time {
+        text-align: right;
+    }
+
+    .badge {
+        margin-bottom: 10px;
+        margin-right: 10px;
+        text-align: left;
+    }
+
+    .negative-sentiment {
+        color: red !important
+    }
+
+    .neutral-sentiment {
+        color: black !important
+    }
+
+    .positive-sentiment {
+        color: #37c70e !important;
+    }
+</style>
+
+<script>
+    newsModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget
+
+        // Extract info from data-* attributes
+        var headline = button.getAttribute('data-headline')
+        var summary = button.getAttribute('data-summary')
+        var reason = button.getAttribute('data-reason')
+        var srcUrl = button.getAttribute('data-src-url')
+
+        // Update the modal's content.
+        var modalTitle = newsModal.querySelector('.modal-title')
+        var modalBodySummary = newsModal.querySelector('.modal-body #summary')
+        var modalBodyReason = newsModal.querySelector('.modal-body #reason')
+        var readButton = newsModal.querySelector('#readButton')
+
+        modalTitle.textContent = headline
+        modalBodyReason.innerHTML = "<strong>AI Insight:</strong> " + reason
+        modalBodySummary.innerHTML = "<strong> Summary: </strong>" + summary
+        readButton.href = srcUrl
+    })
+</script>
 {% endblock %}
+

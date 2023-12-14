@@ -1,30 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Folio Feed</h1>
-
-<p>Your Tickers:</p>
-<ul>
-    {% for ticker in tickers %}
-    <li>{{ ticker }}</li>
+<div class="container py-5 pt-5">
+    {% for date, analysis_items in analysis_dict.items %}
+    <h3 class="news-heading">News analysis for {{date}}:</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Articles</th>
+            <th>Positive</th>
+            <th>Negative</th>
+            <th>Neutral</th>
+            <th>Avg Sentiment</th>
+            <th>Need Attention</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for analysis in analysis_items %}
+        <tr class="{% if analysis.need_attention %}highlight-border{% endif %}">
+            <td><a href="{% url 'news' analysis.symbol date %}">{{ analysis.symbol }}</a></td>
+            <td>{{ analysis.total_news }}</td>
+            <td>{{ analysis.positive_news }}</td>
+            <td>{{ analysis.negative_news }}</td>
+            <td>{{ analysis.neutral_news }}</td>
+            <td class="{% if analysis.average_sentiment < 0 %}negative-sentiment{% elif analysis.average_sentiment == 0 %}neutral-sentiment{% else %}positive-sentiment{% endif %}">{{ analysis.average_sentiment }}</td>
+            <td>{{ analysis.need_attention }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% endfor %}
-</ul>
+</div>
 
-<form method="post">
-    {% csrf_token %}
-    {{form}}
-    <input type="submit" value="Add Ticker">
-</form>
+<style>
+    .news-heading {
+        margin-bottom: 20px;
+    }
 
-<p>Here is news analysis for {{date}}:</p>
-{% for analysis in analysis_items %}
-<h2><a href="{% url 'news' analysis.symbol date %}">{{ analysis.symbol }}</a></h2>
-<p>Avg Sentiment: {{ analysis.average_sentiment }}</p>
-<p>Number of Articles: {{ analysis.total_news }}</p>
-<p>Number of Positive Articles: {{ analysis.positive_news }}</p>
-<p>Number of Negative Articles: {{ analysis.negative_news }}</p>
-<p>Number of Neutral Articles: {{ analysis.neutral_news }}</p>
-<p> Need Attention: {{analysis.need_attention}}</p>
-{% endfor %}
+    .table {
+        margin-bottom: 50px;
+    }
 
+    .highlight-border {
+        border: 2px solid rgba(238, 121, 18, 0.78);
+    }
+
+    .negative-sentiment {
+        color: red !important
+    }
+    .neutral-sentiment {
+        color: black !important
+    }
+    .positive-sentiment {
+        color: green !important;
+    }
+</style>
 {% endblock %}
