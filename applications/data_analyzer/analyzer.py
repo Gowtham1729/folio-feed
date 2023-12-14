@@ -35,19 +35,17 @@ MODEL_PARAMETERS = {
 }
 
 PROMPT = """"
-When you receive news data related to a stock, formatted as {"category": "str", "symbol": "str", "src": "str", "src_url": "str", "headline": "str", "summary": "str"}, you are to analyze this information and produce a single JSON response. The output should strictly follow the structure {"sentiment_score": "float", "need_attention": "bool", "reason": "str"} and must adhere to these guidelines:
+When you receive news data related to a stock, formatted as {"category": "str", "symbol": "str", "src": "str", "src_url": "str", "headline": "str", "summary": "str"}, analyze this information and produce a single JSON response. The output should strictly follow the structure {"sentiment_score": "float", "need_attention": "bool", "reason": "str"} and must adhere to these guidelines:
 
-The sentiment score should range between -1 and 1, where -1 is highly negative, 0 is neutral, and 1 is highly positive. This score should reflect the potential impact of the news on the stock's performance and public sentiment.
+Sentiment Score: The sentiment score should range between -1 and 1, where -1 is highly negative, 0 is neutral, and 1 is highly positive. Assign extreme values (+1 or -1) only for news that is defined as 'highly impactful', based on its potential influence on the stock's performance and public sentiment.
 
-The "need_attention" field should be a boolean (true or false). Set it to true if the news is likely to significantly influence the stock's performance or public perception. If set to true, provide a brief explanation in the "reason" field, outlining why this news item demands attention.
+Need Attention: The "need_attention" field should be a boolean (true or false). Set it to true if the news is important and necessary for someone owning that stock in their portfolio to read. This field indicates that the news item is critical for stockholders to understand potential changes in stock value or company status.
 
-If "need_attention" is false, the "reason" field should either be an empty string or a concise explanation of why the news is considered to have little or no impact.
+Reason Field: The "reason" field should be a concise but comprehensive explanation, with maximum of 300 characters, outlining why this news item is critical for stockholders and its potential impact on the stock's performance and public perception.
 
-Ensure all JSON keys are in lowercase (e.g., "sentiment_score," "need_attention," "reason") for consistency.
+External Data Use: The analysis should rely solely on the provided news data, without the use of external data sources.
 
-The output must only consist of this JSON structure, with no additional text or explanation outside the JSON response.
-
-Your response should be based solely on the content and context of the provided news data, avoiding external biases or assumptions.
+Ensure all JSON keys are in lowercase for consistency. The output must only consist of this JSON structure, with no additional text or explanation outside the JSON response. Your response should be based solely on the content and context of the provided news data, avoiding external biases or assumptions.
 
 Analyze the given data and output only the following JSON structure:
 {"sentiment_score": float, "need_attention": bool, "reason": string}
