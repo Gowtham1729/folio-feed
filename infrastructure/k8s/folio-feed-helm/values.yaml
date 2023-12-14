@@ -31,7 +31,7 @@ fetcher:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-fetcher
-    tag: &fetcherImageTag 4bd0eb6d467033ebfe50555b88b3b7c0a49909a0
+    tag: &fetcherImageTag 4e105431413e00ff949e4deaceb184e9945c36e2
 
   nodeSelector:
     cloud.google.com/gke-spot: "true"
