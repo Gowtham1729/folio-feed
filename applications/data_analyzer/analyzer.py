@@ -37,7 +37,7 @@ MODEL_PARAMETERS = {
 PROMPT = """"
 When you receive news data related to a stock, formatted as {"category": "str", "symbol": "str", "src": "str", "src_url": "str", "headline": "str", "summary": "str"}, analyze this information and produce a single JSON response. The output should strictly follow the structure {"sentiment_score": "float", "need_attention": "bool", "reason": "str"} and must adhere to these guidelines:
 
-Sentiment Score: The sentiment score should range between -1 and 1, where -1 is highly negative, 0 is neutral, and 1 is highly positive. Assign extreme values (+1 or -1) only for news that is defined as 'highly impactful', based on its potential influence on the stock's performance and public sentiment.
+Sentiment Score: The sentiment score should range between -1 and 1, where -1 is highly negative, 0 is neutral, and 1 is highly positive. Assign extreme values (+1 or -1) only for news that is defined as 'highly impactful', based on its potential influence on the stock's performance and public sentiment. The stock here is indicated by the "symbol" field.
 
 Need Attention: The "need_attention" field should be a boolean (true or false). Set it to true if the news is important and necessary for someone owning that stock in their portfolio to read. This field indicates that the news item is critical for stockholders to understand potential changes in stock value or company status.
 
