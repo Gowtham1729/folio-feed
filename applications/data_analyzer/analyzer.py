@@ -151,7 +151,10 @@ class Analyzer:
             category=news[0].category,
             symbol=symbol,
             date=datetime.now().date().isoformat(),
-            average_sentiment=sum([item.sentiment for item in news if item.sentiment != 0]) / len(news),
+            average_sentiment=sum(
+                [item.sentiment for item in news if item.sentiment != 0]
+            )
+            / len(news),
             total_news=len(news),
             positive_news=len([item for item in news if item.sentiment > 0]),
             negative_news=len([item for item in news if item.sentiment < 0]),
