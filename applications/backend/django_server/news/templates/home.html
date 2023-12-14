@@ -4,36 +4,45 @@
 <div class="container py-5 pt-5">
     {% for date, analysis_items in analysis_dict.items %}
     <h3 class="news-heading">News analysis for {{date}}:</h3>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Articles</th>
-            <th>Positive</th>
-            <th>Negative</th>
-            <th>Neutral</th>
-            <th>Avg Sentiment</th>
-            <th>Need Attention</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for analysis in analysis_items %}
-        <tr class="{% if analysis.need_attention %}highlight-border{% endif %}">
-            <td><a href="{% url 'news' analysis.symbol date %}">{{ analysis.symbol }}</a></td>
-            <td>{{ analysis.total_news }}</td>
-            <td>{{ analysis.positive_news }}</td>
-            <td>{{ analysis.negative_news }}</td>
-            <td>{{ analysis.neutral_news }}</td>
-            <td class="{% if analysis.average_sentiment < 0 %}negative-sentiment{% elif analysis.average_sentiment == 0 %}neutral-sentiment{% else %}positive-sentiment{% endif %}">{{ analysis.average_sentiment }}</td>
-            <td>{{ analysis.need_attention }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive"> <!-- Add this div to make table responsive -->
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Articles</th>
+                <th>Positive</th>
+                <th>Negative</th>
+                <th>Neutral</th>
+                <th>Avg Sentiment</th>
+                <th>Need Attention</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for analysis in analysis_items %}
+            <tr class="{% if analysis.need_attention %}highlight-border{% endif %}">
+                <td><a href="{% url 'news' analysis.symbol date %}">{{ analysis.symbol }}</a></td>
+                <td>{{ analysis.total_news }}</td>
+                <td>{{ analysis.positive_news }}</td>
+                <td>{{ analysis.negative_news }}</td>
+                <td>{{ analysis.neutral_news }}</td>
+                <td class="{% if analysis.average_sentiment < 0 %}negative-sentiment{% elif analysis.average_sentiment == 0 %}neutral-sentiment{% else %}positive-sentiment{% endif %}">{{ analysis.average_sentiment|floatformat:3 }}</td>
+                <td>{{ analysis.need_attention }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div> <!-- End of responsive table div -->
     {% endfor %}
 </div>
 
 <style>
+    /* Add media query for smaller screens */
+    @media (max-width: 768px) {
+        .news-heading {
+            font-size: 1.5em; /* Adjust font size */
+        }
+    }
+
     .news-heading {
         margin-bottom: 20px;
     }
