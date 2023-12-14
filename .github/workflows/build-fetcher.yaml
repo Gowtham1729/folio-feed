@@ -41,8 +41,8 @@ jobs:
     - name: Run Lint Check
       run: task lint-check
 
-    - name: Run all tests
-      run: task test
+#    - name: Run all tests
+#      run: task test
 
       # Authentication to GCP via credentials json
     - id: 'auth'

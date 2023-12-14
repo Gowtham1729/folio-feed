@@ -120,7 +120,7 @@ tasks:
     deps:
       - install-fetcher
     cmds:
-      - echo "Tested the Data Fetcher"
+      - pytest applications/data_fetcher
 
   test-analyzer:
     desc: Run tests for the Data Analyzer.
