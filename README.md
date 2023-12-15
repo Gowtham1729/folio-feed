@@ -1,9 +1,9 @@
-# Folio Feed: Your Personalized Stock News and Sentiment Dashboard
-In today's fast-paced financial markets, keeping track of news affecting your stock portfolio can be a daunting task. 
+# Folio Feed: Personalized Portfolio News and Sentiment Dashboard
+In today's fast-paced financial markets, keeping track of news affecting your stock portfolio can be a daunting and time-consuming task especially when your portfolio contains many individual stocks, mutual funds and cryptocurrencies. 
 Even more challenging is understanding the overall sentiment of the news related to each stock, which can be pivotal in making informed investment decisions. 
 Folio Feed addresses this gap by offering a one-stop solution to aggregate, analyze, and visualize news articles for the stocks in your portfolio.
 
-Folio Feed not only aggregates news from multiple, reputable sources but also employs advanced sentiment analysis to categorize each article as positive, negative, or neutral. 
+Folio Feed not only aggregates news from multiple, reputable sources but also employs advanced AI sentiment analysis to categorize each article as positive, negative, or neutral. 
 Through an easy-to-use dashboard, Folio Feed empowers investors to keep their fingers on the pulse of companies they have invested in, without having to sift through a myriad of news portals and financial reports.
 
 With Folio Feed, stay updated and make smarter investment choices, even on your busiest days.
@@ -15,9 +15,9 @@ With Folio Feed, stay updated and make smarter investment choices, even on your 
 
 ## Tech Stack
 
-- **Backend**: Python, Flask
-- **Testing**: Pytest
-- **Frontend**: HTML, CSS, JS, Vue.js, Nuxt.js
+- **Backend**: Python, Django
+- **Testing**: Pytest, Unittest
+- **Frontend**: HTML, CSS, JS, Bootstrap
 - **Database**: Postgresql
 - **Message Broker**: RabbitMQ
 - **Deployment**: Docker, Kubernetes (Google Kubernetes Engine), Helm, Terraform, Google Cloud Platform
@@ -29,10 +29,13 @@ With Folio Feed, stay updated and make smarter investment choices, even on your 
 ```mermaid
 flowchart LR
 A((User)) --> B[Web Application]
-B --> D[Messaging Queue] --> C[Data Fetcher] --> N[News API]
+B --> C[Data Fetcher] --> N[External News API]
+C --> D[Messaging Queue]
 C -- Cron Job --> C
 E[Data Analyzer] --> S[Sentiment Analysis Model API]
+D --> E
 E --> F[(Database)]
+F --> E
 B --> F
 C --> F
 B --> A
@@ -56,24 +59,22 @@ graph LR
     
     subgraph GCP
         GCR[GCR]
-        NLP_AI[NLP API]
+        NLP_AI[Vertex AI]
         subgraph GKE
             DF["Data Fetcher (Cron Job)"]
             DA[Data Analyzer]
-            FE[Vue JS Frontend]
-            BE[Flask Backend]
+            WA[Django Web application]
             DB[(Postgres)]
             ing[GKE Ingress]
             MQ[RabbitMQ]
             
             DF --> DB
-            DF -- every 12 hours --> DF
-            DA --> DB
-            BE --> DB
-            ing -- / --> FE
-            ing -- "/api (RESTful API)" --> BE
-            BE --> MQ
+            DF -- every n hours --> DF
             MQ --> DA
+            DA --> DB
+            WA --> DB
+            ing -- / --> WA
+            ing -- "/api (RESTful API)" --> WA
         
             prometheus[GKE Managed Prometheus]
             
