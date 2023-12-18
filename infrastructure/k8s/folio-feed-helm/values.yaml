@@ -48,7 +48,7 @@ analyzer:
   image:
     registry: us-central1-docker.pkg.dev/folio-feed-403709/image-registry
     repository: folio-feed-analyzer
-    tag: &analyzerImageTag 6fdc3b1e73ca868913e6475415e8b932bd8bc89d
+    tag: &analyzerImageTag e4afd3b589a6699259aeda5122b5a42ae682208d
   modelName: "text-bison"
 
   nodeSelector:
