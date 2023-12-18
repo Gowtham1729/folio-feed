@@ -37,7 +37,7 @@ MODEL_PARAMETERS = {
 PROMPT = """"
 When you receive news data related to a stock, formatted as {"category": "str", "symbol": "str", "src": "str", "src_url": "str", "headline": "str", "summary": "str"}, analyze this information and produce a single JSON response. The output should strictly follow the structure {"sentiment_score": "float", "need_attention": "bool", "reason": "str"} and must adhere to these guidelines:
 
-Sentiment Score: The sentiment score should range between -1 and 1, where -1 is highly negative, 0 is neutral, and 1 is highly positive. Assign extreme values (+1 or -1) only for news that is defined as 'highly impactful', based on its potential influence on the stock's performance and public sentiment. The stock here is indicated by the "symbol" field.
+Sentiment Score: The sentiment score should range between -10 and 10, where -10 is highly negative, 0 is neutral, and 10 is highly positive. Assign extreme values (+10 or -10) only for news that is defined as 'highly impactful', based on its potential influence on the stock's performance and public sentiment. The stock here is indicated by the "symbol" field.
 
 Need Attention: The "need_attention" field should be a boolean (true or false). Set it to true if the news is important and necessary for someone owning that stock in their portfolio to read. This field indicates that the news item is critical for stockholders to understand potential changes in stock value or company status.
 
@@ -144,47 +144,6 @@ class Analyzer:
             reason=item[11],
         )
 
-    def analyze_symbol(self, symbol: str, news: List[News]) -> Analysis:
-        return Analysis(
-            category=news[0].category,
-            symbol=symbol,
-            date=datetime.now().date().isoformat(),
-            average_sentiment=sum(
-                [item.sentiment for item in news if item.sentiment != 0]
-            )
-            / len(news),
-            total_news=len(news),
-            positive_news=len([item for item in news if item.sentiment > 0]),
-            negative_news=len([item for item in news if item.sentiment < 0]),
-            neutral_news=len([item for item in news if item.sentiment == 0]),
-            need_attention=any([item for item in news if item.need_attention]),
-        )
-
-    def insert_analysis(self, analysis: List[Analysis]):
-        self.cursor.executemany(
-            """
-            INSERT INTO news_analysis
-            (category, symbol, date, average_sentiment, total_news, positive_news, negative_news, neutral_news, need_attention)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (symbol, date) DO UPDATE SET average_sentiment = EXCLUDED.average_sentiment, total_news = EXCLUDED.total_news, positive_news = EXCLUDED.positive_news, negative_news = EXCLUDED.negative_news, neutral_news = EXCLUDED.neutral_news, need_attention = EXCLUDED.need_attention
-            """,
-            [
-                (
-                    item.category,
-                    item.symbol,
-                    item.date,
-                    item.average_sentiment,
-                    item.total_news,
-                    item.positive_news,
-                    item.negative_news,
-                    item.neutral_news,
-                    item.need_attention,
-                )
-                for item in analysis
-            ],
-        )
-        self.connection.commit()
-
     def update_ai_news_analysis(self, news: List[News]):
         self.cursor.executemany(
             """
@@ -261,7 +220,7 @@ class Analyzer:
                 average_sentiment = 
                 (
                     SELECT 
-                        AVG(sentiment) 
+                        COALESCE(AVG(sentiment) FILTER ( WHERE sentiment != 0 ), 0) AS avg_sentiment
                     FROM 
                         news_news 
                     WHERE 
@@ -313,35 +272,6 @@ class Analyzer:
         self.update_daily_analysis(news, date)
         logger.info(f"Analysis Updated!")
         ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    def analyze(self):
-        logger.info(f"Fetching all News...")
-        all_news = self.get_today_news()
-        logger.info(f"News Count: {len(all_news)}")
-        news = {}
-        for item in all_news:
-            if item.symbol not in news:
-                news[item.symbol] = []
-            news[item.symbol].append(item)
-
-        logger.info(f"News AI Analysis...")
-        for symbol, news_list in news.items():
-            for item in news_list:
-                sentiment, need_attention, reason = self.ai_analysis(item)
-                item.sentiment = sentiment
-                item.need_attention = need_attention
-                item.reason = reason
-
-        logger.info(f"Updating AI Analysis...")
-        self.update_ai_news_analysis(all_news)
-
-        logger.info(f"Analyzing Each Symbol...")
-        analysis = [self.analyze_symbol(symbol, news) for symbol, news in news.items()]
-        logger.info(f"Analysis: {analysis}")
-
-        logger.info(f"Inserting Analysis...")
-        self.insert_analysis(analysis)
-        logger.info(f"Analysis Finished!")
 
 
 if __name__ == "__main__":
