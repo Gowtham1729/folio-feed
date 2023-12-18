@@ -258,7 +258,17 @@ class Analyzer:
             """
             UPDATE news_analysis
             SET 
-                average_sentiment = (SELECT AVG(sentiment) FROM news_news WHERE sentiment!=0), 
+                average_sentiment = 
+                (
+                    SELECT 
+                        AVG(sentiment) 
+                    FROM 
+                        news_news 
+                    WHERE 
+                        sentiment!=0 AND 
+                        symbol = %s AND 
+                        DATE(publish_time) = %s
+                ), 
                 total_news = total_news + 1, 
                 positive_news = positive_news + %s, 
                 negative_news = negative_news + %s, 
@@ -267,6 +277,8 @@ class Analyzer:
             WHERE symbol = %s AND date = %s
             """,
             (
+                news.symbol,
+                date,
                 1 if news.sentiment > 0 else 0,
                 1 if news.sentiment < 0 else 0,
                 1 if news.sentiment == 0 else 0,
