@@ -52,10 +52,10 @@
                         <div class="mt-auto d-flex flex-column">
                             <div class="mt-auto d-flex">
                             <span class="badge {% if item.sentiment < 0 %}bg-danger{% elif item.sentiment == 0 %}bg-secondary{% else %}bg-success{% endif %}">
-                                Impact: {% if item.sentiment < 0 %}Negative{% elif item.sentiment == 0 %}Neutral{% else %}Positive{% endif %}
+                                Outlook: {% if item.sentiment < 0 %}Negative{% elif item.sentiment == 0 %}Neutral{% else %}Positive{% endif %}
                             </span>
                                 <span class="badge {% if item.sentiment < 0 %}bg-danger{% elif item.sentiment == 0 %}bg-secondary{% else %}bg-success{% endif %}">
-                                Score: {% if item.sentiment < 0 %}{{item.sentiment}}/1{% elif item.sentiment == 0 %}{{item.sentiment}}/1{% else %}{{item.sentiment}}/1{% endif %}
+                                Score: {% if item.sentiment < 0 %}{{item.sentiment}}{% elif item.sentiment == 0 %}{{item.sentiment}}{% else %}{{item.sentiment}}{% endif %}
                             </span>
                                 {% if item.need_attention %}
                                 <span class="badge bg-info">Read Recommendation</span>

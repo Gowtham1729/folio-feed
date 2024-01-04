@@ -10,10 +10,10 @@ from .serializers import AnalysisSerializer, NewsSerializer, TickerSerializer
 
 
 def home(request):
-    three_days_ago = datetime.now().date() - timedelta(days=3)
+    ten_days_ago = datetime.now().date() - timedelta(days=10)
     analysis = (
         Analysis.objects.all()
-        .filter(date__gte=three_days_ago)
+        .filter(date__gte=ten_days_ago)
         .order_by("-date", "-total_news", "symbol")
     )
     analysis_dict = {}
