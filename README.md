@@ -104,3 +104,6 @@ graph LR
 <img width="1571" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/54f96af7-6240-480c-b3aa-2ea57b2ae54c">
 
 <img width="1571" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/76479ac4-efae-4d3f-9814-deae61f66f24">
+
+<img width="1559" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/f28d7490-6f4e-4252-bf66-ef00fb5df81e">
+
