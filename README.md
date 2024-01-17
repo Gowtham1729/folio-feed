@@ -97,3 +97,10 @@ graph LR
     TF[Terraform] -- deploy --> GCP
     dev -- infrastructure changes --> TF
 ```
+
+## Screenshots
+<img width="1571" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/8f9f8f6d-ae4d-4648-8637-4db3dd51d363">
+
+<img width="1571" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/54f96af7-6240-480c-b3aa-2ea57b2ae54c">
+
+<img width="1571" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/76479ac4-efae-4d3f-9814-deae61f66f24">
