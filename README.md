@@ -98,6 +98,11 @@ graph LR
     dev -- infrastructure changes --> TF
 ```
 
+
+## Demo
+https://github.com/Gowtham1729/folio-feed/assets/25081151/90cbc256-62cd-4ab6-8f86-8cef40ee96e1
+
+
 ## Screenshots
 <img width="1571" alt="image" src="https://github.com/Gowtham1729/folio-feed/assets/25081151/8f9f8f6d-ae4d-4648-8637-4db3dd51d363">
 
